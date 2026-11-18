@@ -1927,10 +1927,11 @@ async def cb_confirm_start_bot(callback: CallbackQuery, state: FSMContext):
         expected_bot_username=bot_username,
         task_message_id=callback.message.message_id
     )
-    # Отправляем НОВОЕ сообщение с просьбой переслать
+    # ВАЖНО: экранируем username для Markdown!
+    safe_bot_username = escape_md(bot_username)
     await bot.send_message(
         chat_id=callback.from_user.id,
-        text=get_text(lang, 'forward_request', bot_username=bot_username),
+        text=get_text(lang, 'forward_request', bot_username=safe_bot_username),
         parse_mode="Markdown"
     )
     await state.set_state(ConfirmBotStates.waiting_forward)
