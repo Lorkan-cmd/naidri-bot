@@ -1723,13 +1723,23 @@ async def msg_enter_budget(message: Message, state: FSMContext):
     if budget < reward:
         await message.answer(get_text(lang, 'budget_low', reward=reward))
         return
+    
+    # Получаем баланс с проверкой на существование пользователя
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute('SELECT balance FROM users WHERE telegram_id = ?', (message.from_user.id,))
         user = await cursor.fetchone()
+        
+        if not user:
+            await message.answer(get_text(lang, 'err_no_reg'))
+            await state.clear()
+            return
+        
         balance = user[0]
+    
     if balance < budget:
         await message.answer(get_text(lang, 'budget_insufficient', balance=balance, budget=budget))
         return
+    
     max_executors = budget // reward
     remainder = budget - (max_executors * reward)
     await state.update_data(budget=budget, max_executors=max_executors, remainder=remainder)
