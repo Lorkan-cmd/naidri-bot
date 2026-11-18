@@ -6,7 +6,7 @@ import aiosqlite
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, Router, F
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice, MessageOriginChat
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -34,12 +34,7 @@ TRANSLATIONS = {
         'btn_menu': "🔙 В меню",
         'btn_cancel': "❌ Отмена",
         'btn_confirm': "✅ Подтвердить",
-        'help_text': "ℹ️ *Как работает бот*\n\n📋 *Взять задание* — выполняй задания и получай токены\n➕ *Создать задание* — размести рекламу своего канала\n🗑 *Мои задания* — удали свои задания и верни токены\n💰 *Баланс* — пополняй через Telegram Stars или рубли\n👥 *Рефералы* — приглашай друзей и получай 10% от их трат\n🛎 *Поддержка* — вопросы к админу\n🎁 *Промокод* — активируй промокод и получи бонус\n\n👑 *Премиум (120 Stars/месяц):*\n• +600 токенов каждый день\n• Задания в первом ряду витрины\n• Создание заданий без выполнения 3 чужих\n• До 10 заданий в день\n• Бейдж 👑 и приоритетная поддержка\n• Скидка 20% на пополнение\n\n📌 *Правила:*\n• Минимальная награда: 100 токенов\n• Стартовый бонус: 300 токенов\n• Штраф за отписку: -200 токенов (через 48 часов)\n• Создать задание можно после выполнения 3 чужих (или с премиумом)\n\n📜 *Команды:*\n• /history — история транзакций\n• /stats — твоя статистика\n• /top — рейтинг за месяц (ТОП-3 получают премиум!)\n• /promo — активировать промокод\n• /lang — сменить язык",
-        'choose_lang': "🌐 *Выбери язык*\n\nНажми кнопку для смены языка:",
-        'lang_changed': "✅ Язык изменён на *{lang_name}*!",
-        'lang_ru': "🇷🇺 Русский",
-        'lang_en': "🇬🇧 English",
-        'lang_uk': "🇺🇦 Українська",
+        'btn_delete': "🗑 Удалить #{id}",
         'no_tasks': "📋 Сейчас нет доступных заданий. Попробуй позже!",
         'no_my_tasks': "📋 У тебя нет активных заданий.",
         'top_empty': "🏆 В этом месяце ещё никто не заработал токенов. Стань первым! 🚀",
@@ -89,7 +84,7 @@ TRANSLATIONS = {
         'task_summary': "📋 Сводка задания:\n\nТип: {type}\nСсылка: {link}\nНаграда за исполнителя: {reward} токенов\nБюджет: {budget} токенов\nМакс. исполнителей: {max} чел.\nВернётся тебе: {rem} токенов\n\nПодтвердить создание?",
         'task_created': "✅ Задание успешно создано!\n\nТеперь его могут выполнять другие пользователи.",
         'task_cancelled': "❌ Создание задания отменено.",
-        'ref_title': "👥 *Реферальная система*\n\nПриглашено друзей: {n}\nТы получаешь 300 токенов за каждого друга + 10% от всех его трат!\n\n*Твоя ссылка:*\n{link}\n\nОтправь эту ссылку друзьям!",
+        'ref_title': "👥 *Реферальная система*\n\nПриглашено друзей: {n}\nТы получаешь 10% от всех трат друга!\n\n*Твоя ссылка:*\n{link}\n\nОтправь эту ссылку друзьям!",
         'btn_copy_link': "📋 Скопировать ссылку",
         'support_title': "🛎 *Поддержка*\n\nОпиши свою проблему, и админ ответит тебе:",
         'support_sent': "✅ Сообщение отправлено админу! Жди ответа.",
@@ -110,14 +105,12 @@ TRANSLATIONS = {
         'btn_send_report': "📸 Отправить отчёт",
         'err_not_subscribed': "⚠️ Ты не подписан на канал! Подпишись и попробуй снова.",
         'err_invalid_link': "⚠️ Неправильная ссылка!\n\nНужна ссылка на публичный канал вида:\nhttps://t.me/username_канала",
-        'err_bot_not_found': "⚠️ Бот не найден: {name}\nОшибка: {err}",
         'err_member_inaccessible': "⚠️ Бот не может проверить участников!\n\nВключена настройка «Скрыть список подписчиков».\nОтключи её в настройках канала:\nИзменить → Тип канала → Скрыть список подписчиков (ВЫКЛ)",
         'err_chat_not_found': "⚠️ Бот не может найти канал {name}!\n\nУбедись, что:\n1. Канал публичный\n2. Username указан правильно\n3. Бот добавлен в канал как администратор",
         'err_check': "⚠️ Ошибка проверки: {err}",
         'task_done': "✅ Задание выполнено!\n\nТебе начислено: {n} токенов",
-        'task_done_special': "✅ Отчёт отправлен! Жди проверки админом.",
         'penalty_msg': "⚠️ *Штраф за отписку!*\n\nТы отписался от канала раньше, чем через {hours} часов после выполнения задания #{id}.\nС твоего баланса списано *{amount} токенов*.",
-        'premium_title': "👑 *Премиум-подписка*\n\n*Цена:* {stars} Telegram Stars\n\n*Преимущества:*\n• +{daily} токенов каждый день\n• Задания в первом ряду витрины\n• Создание заданий без выполнения 3 чужих\n• До {max} заданий в день\n• Бейдж 👑 в профиле\n• Приоритетная поддержка\n• Скидка 20% на пополнение\n\n⚠️ *Важно:* Подписка оформляется на {days} дней. Продление — ручное, то есть тебе нужно будет самостоятельно купить подписку снова, когда текущая закончится. Автоматического списания не будет!\n\nНажми кнопку ниже для оплаты:",
+        'premium_title': "👑 *Премиум-подписка*\n\n*Цена:* {stars} Telegram Stars\n\n*Преимущества:*\n• +{daily} токенов каждый день\n• Задания в первом ряду витрины\n• Создание заданий без выполнения 3 чужих\n• До {max} заданий в день\n• Бейдж 👑 в профиле\n• Приоритетная поддержка\n• Скидка 20% на пополнение\n\n⚠️ *Важно:* Подписка оформляется на {days} дней. Продление — ручное!\n\nНажми кнопку ниже для оплаты:",
         'btn_pay_premium': "💳 Оплатить {stars} Stars",
         'already_premium': "⚠️ У тебя уже активен премиум до {date}!",
         'topup_stars_title': "⭐️ *Пополнение через Telegram Stars*\n\nВведи количество токенов, которое хочешь получить.\n\n💰 Курс: *{rate} Stars* за 1000 токенов{disc}\n📏 Минимум: *{min} токенов*\n\n💡 Примеры:\n• 1000 токенов = {s1} Stars\n• 5000 токенов = {s5} Stars\n• 10000 токенов = {s10} Stars\n\nОтправь число токенов:",
@@ -127,7 +120,7 @@ TRANSLATIONS = {
         'pay_confirm': "📋 *Подтверждение оплаты:*\n\nТокенов: *{tokens}*\nК оплате: *{stars} Telegram Stars*\n(эквивалент ~{rub}₽)\n\nНажми кнопку для оплаты:",
         'btn_pay': "✅ Оплатить {stars} Stars",
         'pay_success': "✅ *Баланс пополнен!*\n\nТебе начислено *{n} токенов*.",
-        'premium_activated': "👑 *Премиум активирован!*\n\nСпасибо за покупку! Твой премиум активен до *{date}*.\n\nТеперь ты получаешь +{daily} токенов каждый день и все остальные преимущества!",
+        'premium_activated': "👑 *Премиум активирован!*\n\nСпасибо за покупку! Твой премиум активен до *{date}*.\n\nТеперь ты получаешь +{daily} токенов каждый день!",
         'cancel_exec': "❌ Выполнение задания отменено.",
         'report_dup': "⚠️ Ты уже жаловался на это задание!",
         'report_self': "⚠️ Нельзя жаловаться на своё задание!",
@@ -143,8 +136,6 @@ TRANSLATIONS = {
         'err_limit': "⚠️ Ты достиг лимита заданий на сегодня ({n}/{n})!",
         'err_need_3': "⚠️ Сначала выполни 3 чужих задания!\nВыполнено: {n}/3\n\n💡 Купи премиум, чтобы создавать задания сразу!",
         'err_no_tokens': "⚠️ Недостаточно токенов! Минимум 100 токенов для создания задания.",
-        'creator_done': "✅ Твоё задание #{id} полностью выполнено!\nВернулось: {rem} токенов",
-        'creator_special_done': "✅ Твоё особое задание #{id} полностью выполнено!\nВернулось: {rem} токенов",
         'refresh': "🔄 Обновить",
         'promo_title': "🎁 *Активация промокода*\n\nВведи промокод:",
         'promo_success': "✅ Промокод активирован!\n\nТебе начислено *{amount} токенов*.\nПромокод: {code}",
@@ -160,19 +151,13 @@ TRANSLATIONS = {
         'my_task_line': "#{id} {type} — {reward} токенов\nВыполнено: {done}/{max}\nВернётся при удалении: {refund} токенов\n",
         'task_deleted': "✅ Задание #{id} удалено!\n\nТебе возвращено: *{refund} токенов*",
         'task_already_done': "⚠️ Это задание уже полностью выполнено, удалять нечего.",
-        'admin_delete_title': "🗑 *Удаление задания*\n\nВведи ID задания для удаления:\n(Админ может удалять любые задания)",
-        'admin_delete_success': "✅ Задание #{id} удалено!\nПользователю ID {user_id} возвращено {refund} токенов.",
-        'admin_delete_no_task': "❌ Задание не найдено!",
-        'admin_delete_all_confirm': "⚠️ *ВНИМАНИЕ!*\n\nТы собираешься удалить **ВСЕ** активные задания ({count} шт.).\n\nПользователям будут возвращены неиспользованные токены.\n\nЭто действие нельзя отменить!\n\nНажми кнопку для подтверждения:",
-        'admin_delete_all_done': "✅ Удалено заданий: {count}\nВозвращено токенов пользователям: {total_refund}",
-        'admin_delete_all_cancel': "❌ Удаление всех заданий отменено.",
-        'btn_confirm_delete_all': "⚠️ ДА, УДАЛИТЬ ВСЕ",
-        'btn_cancel_delete_all': "❌ Отмена",
-        'subscribe_warning': "⚠️ *Важно для создателя задания:*\n\n"
-            "Чтобы задание работало корректно, бот должен быть:\n"
-            "1️⃣ Добавлен в канал как *администратор*\n"
-            "2️⃣ Настройка «Скрыть список подписчиков» должна быть *ВЫКЛЮЧЕНА*\n\n"
-            "Если эти условия не выполнены, задание выдаст ошибку при проверке.",
+        'choose_lang': "🌐 *Выбери язык*\n\nНажми кнопку для смены языка:",
+        'lang_changed': "✅ Язык изменён на *{lang_name}*!",
+        'lang_ru': "🇷🇺 Русский",
+        'lang_en': "🇬🇧 English",
+        'lang_uk': "🇺🇦 Українська",
+        'help_text': "ℹ️ *Как работает бот*\n\n📋 *Взять задание* — выполняй задания и получай токены\n➕ *Создать задание* — размести рекламу своего канала\n🗑 *Мои задания* — удали свои задания и верни токены\n💰 *Баланс* — пополняй через Telegram Stars или рубли\n👥 *Рефералы* — приглашай друзей и получай 10% от их трат\n🛎 *Поддержка* — вопросы к админу\n🎁 *Промокод* — активируй промокод и получи бонус\n\n👑 *Премиум (120 Stars/месяц):*\n• +600 токенов каждый день\n• Задания в первом ряду витрины\n• Создание заданий без выполнения 3 чужих\n• До 10 заданий в день\n• Бейдж 👑 и приоритетная поддержка\n• Скидка 20% на пополнение\n\n📌 *Правила:*\n• Минимальная награда: 100 токенов\n• Стартовый бонус: 300 токенов\n• Штраф за отписку: -200 токенов (через 48 часов)\n• Создать задание можно после выполнения 3 чужих (или с премиумом)\n\n📜 *Команды:*\n• /history — история транзакций\n• /stats — твоя статистика\n• /top — рейтинг за месяц (ТОП-3 получают премиум!)\n• /promo — активировать промокод\n• /lang — сменить язык",
+        'subscribe_warning': "⚠️ *Важно для создателя задания:*\n\nЧтобы задание работало корректно, бот должен быть:\n1️⃣ Добавлен в канал как *администратор*\n2️⃣ Настройка «Скрыть список подписчиков» должна быть *ВЫКЛЮЧЕНА*\n\nЕсли эти условия не выполнены, задание выдаст ошибку при проверке.",
     },
     'en': {
         'welcome_new': "👋 Welcome, {name}!\n\n🎁 You got a starting bonus: *{bonus} tokens*!\nYour balance: *{balance} tokens*.\n\nThis is a mutual PR bot: complete tasks, earn tokens, and promote your channel!",
@@ -191,12 +176,7 @@ TRANSLATIONS = {
         'btn_menu': "🔙 To menu",
         'btn_cancel': "❌ Cancel",
         'btn_confirm': "✅ Confirm",
-        'help_text': "ℹ️ *How the bot works*\n\n📋 *Take task* — complete tasks and earn tokens\n➕ *Create task* — advertise your channel\n🗑 *My tasks* — delete your tasks and get tokens back\n💰 *Balance* — top up via Telegram Stars or rubles\n👥 *Referrals* — invite friends and get 10% of their spending\n🛎 *Support* — contact admin\n🎁 *Promo* — activate promo code for bonus\n\n👑 *Premium (120 Stars/month):*\n• +600 tokens every day\n• Tasks in first row\n• Create tasks without 3 completed\n• Up to 10 tasks per day\n• 👑 badge and priority support\n• 20% discount on top-up\n\n📌 *Rules:*\n• Min reward: 100 tokens\n• Starting bonus: 300 tokens\n• Unsubscribe penalty: -200 tokens (after 48 hours)\n• Create task after 3 completed (or with premium)\n\n📜 *Commands:*\n• /history — transaction history\n• /stats — your statistics\n• /top — monthly rating (TOP-3 get premium!)\n• /promo — activate promo code\n• /lang — change language",
-        'choose_lang': "🌐 *Choose language*\n\nTap a button to change language:",
-        'lang_changed': "✅ Language changed to *{lang_name}*!",
-        'lang_ru': "🇷🇺 Русский",
-        'lang_en': "🇬🇧 English",
-        'lang_uk': "🇺🇦 Українська",
+        'btn_delete': "🗑 Delete #{id}",
         'no_tasks': "📋 No tasks available right now. Try later!",
         'no_my_tasks': "📋 You have no active tasks.",
         'top_empty': "🏆 No one has earned tokens this month yet. Be the first! 🚀",
@@ -246,7 +226,7 @@ TRANSLATIONS = {
         'task_summary': "📋 Task summary:\n\nType: {type}\nLink: {link}\nReward per executor: {reward} tokens\nBudget: {budget} tokens\nMax executors: {max} people\nWill return to you: {rem} tokens\n\nConfirm creation?",
         'task_created': "✅ Task created successfully!\n\nNow others can complete it.",
         'task_cancelled': "❌ Task creation cancelled.",
-        'ref_title': "👥 *Referral system*\n\nInvited friends: {n}\nYou get 300 tokens for each friend + 10% of their spending!\n\n*Your link:*\n{link}\n\nShare this link with friends!",
+        'ref_title': "👥 *Referral system*\n\nInvited friends: {n}\nYou get 10% of your friend's spending!\n\n*Your link:*\n{link}\n\nShare this link with friends!",
         'btn_copy_link': "📋 Copy link",
         'support_title': "🛎 *Support*\n\nDescribe your issue, and the admin will help you:",
         'support_sent': "✅ Message sent to admin! Wait for reply.",
@@ -267,12 +247,10 @@ TRANSLATIONS = {
         'btn_send_report': "📸 Send report",
         'err_not_subscribed': "⚠️ You are not subscribed! Subscribe and try again.",
         'err_invalid_link': "⚠️ Invalid link!\n\nNeed a link to a public channel like:\nhttps://t.me/channel_username",
-        'err_bot_not_found': "⚠️ Bot not found: {name}\nError: {err}",
         'err_member_inaccessible': "⚠️ Bot cannot check members!\n\nChannel has 'Hide subscribers' enabled.\nDisable it in channel settings:\nEdit → Channel type → Hide subscribers (OFF)",
         'err_chat_not_found': "⚠️ Bot cannot find channel {name}!\n\nMake sure:\n1. Channel is public\n2. Username is correct\n3. Bot is added as admin",
         'err_check': "⚠️ Check error: {err}",
         'task_done': "✅ Task completed!\n\nYou received: {n} tokens",
-        'task_done_special': "✅ Report sent! Wait for admin review.",
         'penalty_msg': "⚠️ *Unsubscribe penalty!*\n\nYou unsubscribed before {hours} hours after completing task #{id}.\n{amount} tokens have been deducted from your balance.",
         'premium_title': "👑 *Premium subscription*\n\n*Price:* {stars} Telegram Stars\n\n*Benefits:*\n• +{daily} tokens every day\n• Tasks in first row\n• Create tasks without 3 completed\n• Up to {max} tasks per day\n• 👑 badge in profile\n• Priority support\n• 20% discount on top-up\n\n⚠️ *Important:* Subscription is for {days} days. Renewal is manual.\n\nPress button below to pay:",
         'btn_pay_premium': "💳 Pay {stars} Stars",
@@ -300,8 +278,6 @@ TRANSLATIONS = {
         'err_limit': "⚠️ You reached the daily task limit ({n}/{n})!",
         'err_need_3': "⚠️ First complete 3 tasks from others!\nCompleted: {n}/3\n\n💡 Buy premium to create tasks immediately!",
         'err_no_tokens': "⚠️ Not enough tokens! Minimum 100 tokens to create a task.",
-        'creator_done': "✅ Your task #{id} is fully completed!\nReturned: {rem} tokens",
-        'creator_special_done': "✅ Your special task #{id} is fully completed!\nReturned: {rem} tokens",
         'refresh': "🔄 Refresh",
         'promo_title': "🎁 *Promo code activation*\n\nEnter promo code:",
         'promo_success': "✅ Promo code activated!\n\nYou received *{amount} tokens*.\nCode: {code}",
@@ -317,19 +293,13 @@ TRANSLATIONS = {
         'my_task_line': "#{id} {type} — {reward} tokens\nCompleted: {done}/{max}\nRefund on delete: {refund} tokens\n",
         'task_deleted': "✅ Task #{id} deleted!\n\nYou received: *{refund} tokens*",
         'task_already_done': "⚠️ This task is already fully completed, nothing to delete.",
-        'admin_delete_title': "🗑 *Delete task*\n\nEnter task ID to delete:\n(Admin can delete any task)",
-        'admin_delete_success': "✅ Task #{id} deleted!\nUser ID {user_id} received {refund} tokens back.",
-        'admin_delete_no_task': "❌ Task not found!",
-        'admin_delete_all_confirm': "⚠️ *WARNING!*\n\nYou are about to delete **ALL** active tasks ({count} items).\n\nUsers will receive unused tokens back.\n\nThis action cannot be undone!\n\nPress button to confirm:",
-        'admin_delete_all_done': "✅ Deleted tasks: {count}\nTokens returned to users: {total_refund}",
-        'admin_delete_all_cancel': "❌ Deletion of all tasks cancelled.",
-        'btn_confirm_delete_all': "⚠️ YES, DELETE ALL",
-        'btn_cancel_delete_all': "❌ Cancel",
-        'subscribe_warning': "⚠️ *Important for task creator:*\n\n"
-            "For the task to work correctly, the bot must be:\n"
-            "1️⃣ Added to the channel as an *administrator*\n"
-            "2️⃣ The 'Hide subscribers' setting must be *DISABLED*\n\n"
-            "If these conditions are not met, the task will show an error during verification.",
+        'choose_lang': "🌐 *Choose language*\n\nTap a button to change language:",
+        'lang_changed': "✅ Language changed to *{lang_name}*!",
+        'lang_ru': "🇷🇺 Русский",
+        'lang_en': "🇬🇧 English",
+        'lang_uk': "🇺🇦 Українська",
+        'help_text': "ℹ️ *How the bot works*\n\n📋 *Take task* — complete tasks and earn tokens\n➕ *Create task* — advertise your channel\n🗑 *My tasks* — delete your tasks and get tokens back\n💰 *Balance* — top up via Telegram Stars or rubles\n👥 *Referrals* — invite friends and get 10% of their spending\n🛎 *Support* — contact admin\n🎁 *Promo* — activate promo code for bonus\n\n👑 *Premium (120 Stars/month):*\n• +600 tokens every day\n• Tasks in first row\n• Create tasks without 3 completed\n• Up to 10 tasks per day\n• 👑 badge and priority support\n• 20% discount on top-up\n\n📌 *Rules:*\n• Min reward: 100 tokens\n• Starting bonus: 300 tokens\n• Unsubscribe penalty: -200 tokens (after 48 hours)\n• Create task after 3 completed (or with premium)\n\n📜 *Commands:*\n• /history — transaction history\n• /stats — your statistics\n• /top — monthly rating (TOP-3 get premium!)\n• /promo — activate promo code\n• /lang — change language",
+        'subscribe_warning': "⚠️ *Important for task creator:*\n\nFor the task to work correctly, the bot must be:\n1️⃣ Added to the channel as an *administrator*\n2️⃣ The 'Hide subscribers' setting must be *DISABLED*\n\nIf these conditions are not met, the task will show an error during verification.",
     },
     'uk': {
         'welcome_new': "👋 Ласкаво просимо, {name}!\n\n🎁 Ти отримав стартовий бонус: *{bonus} токенів*!\nТвій баланс: *{balance} токенів*.\n\nЦе бот взаємного PR: виконуй завдання, заробляй токени та просувай свій канал!",
@@ -348,12 +318,7 @@ TRANSLATIONS = {
         'btn_menu': "🔙 В меню",
         'btn_cancel': "❌ Скасувати",
         'btn_confirm': "✅ Підтвердити",
-        'help_text': "ℹ️ *Як працює бот*\n\n📋 *Взяти завдання* — виконуй завдання та отримуй токени\n➕ *Створити завдання* — розмісти рекламу свого каналу\n🗑 *Мої завдання* — видали свої завдання та отримай токени назад\n💰 *Баланс* — поповнюй через Telegram Stars або гривні\n👥 *Реферали* — запрошуй друзів і отримуй 10% від їхніх витрат\n🛎 *Підтримка* — питання до адміна\n🎁 *Промокод* — активуй промокод і отримай бонус\n\n👑 *Преміум (120 Stars/місяць):*\n• +600 токенів щодня\n• Завдання в першому ряду\n• Створення завдань без виконання 3 чужих\n• До 10 завдань на день\n• Бейдж 👑 і пріоритетна підтримка\n• Знижка 20% на поповнення",
-        'choose_lang': "🌐 *Обери мову*\n\nНатисни кнопку для зміни мови:",
-        'lang_changed': "✅ Мову змінено на *{lang_name}*!",
-        'lang_ru': "🇷🇺 Русский",
-        'lang_en': "🇬🇧 English",
-        'lang_uk': "🇺🇦 Українська",
+        'btn_delete': "🗑 Видалити #{id}",
         'no_tasks': "📋 Зараз немає доступних завдань. Спробуй пізніше!",
         'no_my_tasks': "📋 У тебе немає активних завдань.",
         'top_empty': "🏆 Цього місяця ще ніхто не заробив токенів. Стань першим! 🚀",
@@ -403,7 +368,7 @@ TRANSLATIONS = {
         'task_summary': "📋 Зведення завдання:\n\nТип: {type}\nПосилання: {link}\nНагорода за виконавця: {reward} токенів\nБюджет: {budget} токенів\nМакс. виконавців: {max} осіб\nПовернеться тобі: {rem} токенів\n\nПідтвердити створення?",
         'task_created': "✅ Завдання успішно створено!\n\nТепер його можуть виконувати інші користувачі.",
         'task_cancelled': "❌ Створення завдання скасовано.",
-        'ref_title': "👥 *Реферальна система*\n\nЗапрошено друзів: {n}\nТи отримуєш 300 токенів за кожного друга + 10% від усіх його витрат!\n\n*Твоє посилання:*\n{link}\n\nНадішли це посилання друзям!",
+        'ref_title': "👥 *Реферальна система*\n\nЗапрошено друзів: {n}\nТи отримуєш 10% від усіх витрат друга!\n\n*Твоє посилання:*\n{link}\n\nНадішли це посилання друзям!",
         'btn_copy_link': "📋 Скопіювати посилання",
         'support_title': "🛎 *Підтримка*\n\nОпиши свою проблему, і адмін відповість тобі:",
         'support_sent': "✅ Повідомлення надіслано адміну! Чекай на відповідь.",
@@ -424,12 +389,10 @@ TRANSLATIONS = {
         'btn_send_report': "📸 Надіслати звіт",
         'err_not_subscribed': "⚠️ Ти не підписаний на канал! Підпишись і спробуй знову.",
         'err_invalid_link': "⚠️ Неправильне посилання!\n\nПотрібне посилання на публічний канал:\nhttps://t.me/username_каналу",
-        'err_bot_not_found': "⚠️ Бот не знайдений: {name}\nПомилка: {err}",
         'err_member_inaccessible': "⚠️ Бот не може перевірити учасників!\n\nУвімкнено налаштування «Приховати список підписників».\nВимкни його в налаштуваннях каналу.",
         'err_chat_not_found': "⚠️ Бот не може знайти канал {name}!\n\nПереконайся, що:\n1. Канал публічний\n2. Username вказано правильно\n3. Бот доданий в канал як адміністратор",
         'err_check': "⚠️ Помилка перевірки: {err}",
         'task_done': "✅ Завдання виконано!\n\nТобі нараховано: {n} токенів",
-        'task_done_special': "✅ Звіт надіслано! Чекай на перевірку адміном.",
         'penalty_msg': "⚠️ *Штраф за відписку!*\n\nТи відписався від каналу раніше, ніж через {hours} годин після виконання завдання #{id}.\nЗ твого балансу списано *{amount} токенів*.",
         'premium_title': "👑 *Преміум-підписка*\n\n*Ціна:* {stars} Telegram Stars\n\n*Переваги:*\n• +{daily} токенів щодня\n• Завдання в першому ряду\n• Створення завдань без виконання 3 чужих\n• До {max} завдань на день\n• Бейдж 👑 в профілі\n• Пріоритетна підтримка\n• Знижка 20% на поповнення\n\n⚠️ *Важливо:* Підписка оформлюється на {days} днів.\n\nНатисни кнопку нижче для оплати:",
         'btn_pay_premium': "💳 Оплатити {stars} Stars",
@@ -457,8 +420,6 @@ TRANSLATIONS = {
         'err_limit': "⚠️ Ти досяг ліміту завдань на сьогодні ({n}/{n})!",
         'err_need_3': "⚠️ Спочатку виконай 3 чужі завдання!\nВиконано: {n}/3\n\n💡 Купи преміум, щоб створювати завдання одразу!",
         'err_no_tokens': "⚠️ Недостатньо токенів! Мінімум 100 токенів для створення завдання.",
-        'creator_done': "✅ Твоє завдання #{id} повністю виконано!\nПовернулось: {rem} токенів",
-        'creator_special_done': "✅ Твоє особливе завдання #{id} повністю виконано!\nПовернулось: {rem} токенів",
         'refresh': "🔄 Оновити",
         'promo_title': "🎁 *Активація промокоду*\n\nВведи промокод:",
         'promo_success': "✅ Промокод активовано!\n\nТобі нараховано *{amount} токенів*.\nКод: {code}",
@@ -474,19 +435,13 @@ TRANSLATIONS = {
         'my_task_line': "#{id} {type} — {reward} токенів\nВиконано: {done}/{max}\nПовернеться при видаленні: {refund} токенів\n",
         'task_deleted': "✅ Завдання #{id} видалено!\n\nТобі повернуто: *{refund} токенів*",
         'task_already_done': "⚠️ Це завдання вже повністю виконано, видаляти нічого.",
-        'admin_delete_title': "🗑 *Видалення завдання*\n\nВведи ID завдання для видалення:\n(Адмін може видаляти будь-які завдання)",
-        'admin_delete_success': "✅ Завдання #{id} видалено!\nКористувачу ID {user_id} повернуто {refund} токенів.",
-        'admin_delete_no_task': "❌ Завдання не знайдено!",
-        'admin_delete_all_confirm': "⚠️ *УВАГА!*\n\nТи збираєшся видалити **ВСІ** активні завдання ({count} шт.).\n\nКористувачам будуть повернені невикористані токени.\n\nЦю дію неможливо скасувати!\n\nНатисни кнопку для підтвердження:",
-        'admin_delete_all_done': "✅ Видалено завдань: {count}\nПовернуто токенів користувачам: {total_refund}",
-        'admin_delete_all_cancel': "❌ Видалення всіх завдань скасовано.",
-        'btn_confirm_delete_all': "⚠️ ТАК, ВИДАЛИТИ ВСІ",
-        'btn_cancel_delete_all': "❌ Скасувати",
-        'subscribe_warning': "⚠️ *Важливо для творця завдання:*\n\n"
-            "Щоб завдання працювало коректно, бот повинен бути:\n"
-            "1️⃣ Доданий у канал як *адміністратор*\n"
-            "2️⃣ Налаштування «Приховати список підписників» повинно бути *ВИМКНЕНО*\n\n"
-            "Якщо ці умови не виконані, завдання видасть помилку під час перевірки.",
+        'choose_lang': "🌐 *Обери мову*\n\nНатисни кнопку для зміни мови:",
+        'lang_changed': "✅ Мову змінено на *{lang_name}*!",
+        'lang_ru': "🇷🇺 Русский",
+        'lang_en': "🇬🇧 English",
+        'lang_uk': "🇺🇦 Українська",
+        'help_text': "ℹ️ *Як працює бот*\n\n📋 *Взяти завдання* — виконуй завдання та отримуй токени\n➕ *Створити завдання* — розмісти рекламу свого каналу\n🗑 *Мої завдання* — видали свої завдання та отримай токени назад\n💰 *Баланс* — поповнюй через Telegram Stars або гривні\n👥 *Реферали* — запрошуй друзів і отримуй 10% від їхніх витрат\n🛎 *Підтримка* — питання до адміна\n🎁 *Промокод* — активуй промокод і отримай бонус\n\n👑 *Преміум (120 Stars/місяць):*\n• +600 токенів щодня\n• Завдання в першому ряду\n• Створення завдань без виконання 3 чужих\n• До 10 завдань на день\n• Бейдж 👑 і пріоритетна підтримка\n• Знижка 20% на поповнення\n\n📌 *Правила:*\n• Мінімальна нагорода: 100 токенів\n• Стартовий бонус: 300 токенів\n• Штраф за відписку: -200 токенів (через 48 годин)\n• Створити завдання можна після виконання 3 чужих (або з преміумом)\n\n📜 *Команди:*\n• /history — історія транзакцій\n• /stats — твоя статистика\n• /top — рейтинг за місяць (ТОП-3 отримують преміум!)\n• /promo — активувати промокод\n• /lang — змінити мову",
+        'subscribe_warning': "⚠️ *Важливо для творця завдання:*\n\nЩоб завдання працювало коректно, бот повинен бути:\n1️⃣ Доданий у канал як *адміністратор*\n2️⃣ Налаштування «Приховати список підписників» повинно бути *ВИМКНЕНО*\n\nЯкщо ці умови не виконані, завдання видасть помилку під час перевірки.",
     }
 }
 
@@ -596,9 +551,6 @@ class AdminStates(StatesGroup):
 
 class PayTokensStates(StatesGroup):
     entering_amount = State()
-
-class LangStates(StatesGroup):
-    choosing = State()
 
 class ReportStates(StatesGroup):
     waiting_screenshot = State()
@@ -1069,11 +1021,11 @@ async def cmd_tasks(message: Message):
             SELECT t.id, t.task_type, t.link, t.reward, t.max_executors, t.completed_count, u.is_premium
             FROM tasks t
             LEFT JOIN users u ON t.creator_id = u.telegram_id
-            WHERE t.status = 'active' 
+            WHERE t.status = 'active'
               AND t.completed_count < t.max_executors
               AND t.creator_id != ?
               AND NOT EXISTS (
-                  SELECT 1 FROM task_executions te 
+                  SELECT 1 FROM task_executions te
                   WHERE te.task_id = t.id AND te.executor_id = ?
               )
             ORDER BY u.is_premium DESC, t.created_at DESC
@@ -1285,37 +1237,6 @@ async def cmd_test_top(message: Message):
     await message.answer("⏳ Подвожу итоги месяца...")
     await calculate_monthly_top()
     await message.answer("✅ Готово!")
-
-
-@router.message(Command("test"))
-async def cmd_test(message: Message):
-    if message.from_user.id != ADMIN_ID:
-        await message.answer("⛔️ Только для админа!")
-        return
-    async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT id, task_type, link FROM tasks ORDER BY id DESC LIMIT 1')
-        task = await cursor.fetchone()
-    if not task:
-        await message.answer("❌ Нет заданий в базе!")
-        return
-    task_id, task_type, link = task
-    channel_username = link.replace("https://t.me/", "").replace("http://t.me/", "").strip()
-    if '/' in channel_username:
-        channel_username = channel_username.split('/')[0]
-    if not channel_username.startswith('@'):
-        channel_username = f"@{channel_username}"
-    text = f"🔍 *Диагностика задания #{task_id}*\n\nТип: {task_type}\nСсылка: {link}\nUsername: `{escape_md(channel_username)}`\n\n"
-    try:
-        chat = await bot.get_chat(channel_username)
-        text += f"✅ Бот видит канал!\n   Название: {chat.title}\n   ID: {chat.id}\n\n"
-    except Exception as e:
-        text += f"❌ Бот не видит канал: {str(e)[:100]}\n\n"
-    try:
-        member = await bot.get_chat_member(channel_username, message.from_user.id)
-        text += f"✅ Ты участник канала! Статус: {member.status}\n"
-    except Exception as e:
-        text += f"❌ Проверка участия не удалась: {str(e)[:100]}\n"
-    await message.answer(text, parse_mode="Markdown")
 
 
 # --- ОБРАБОТЧИКИ CALLBACK ---
@@ -1627,30 +1548,24 @@ async def cb_my_tasks(callback: CallbackQuery):
             ORDER BY id DESC
         ''', (callback.from_user.id,))
         tasks = await cursor.fetchall()
-    
     if not tasks:
         await callback.message.edit_text(get_text(lang, 'no_my_tasks'))
         await callback.answer()
         return
-    
     type_map = {
         "subscribe": get_text(lang, 'type_names_subscribe'),
         "reaction": get_text(lang, 'type_names_reaction'),
         "start_bot": get_text(lang, 'type_names_start_bot'),
         "special": get_text(lang, 'type_names_special'),
     }
-    
     text = get_text(lang, 'my_tasks_title')
     kb_buttons = []
-    
     for task in tasks:
         task_id, task_type, reward, budget, max_exec, completed = task
         refund = budget - (completed * reward)
         type_name = type_map.get(task_type, task_type)
-        
         text += get_text(lang, 'my_task_line', id=task_id, type=type_name, reward=reward, done=completed, max=max_exec, refund=refund)
         text += "\n"
-        
         if refund > 0:
             kb_buttons.append([InlineKeyboardButton(
                 text=get_text(lang, 'btn_delete', id=task_id) + f" (+{refund}🪙)",
@@ -1661,10 +1576,8 @@ async def cb_my_tasks(callback: CallbackQuery):
                 text=f"🔒 #{task_id} (завершено)",
                 callback_data="noop"
             )])
-    
     kb_buttons.append([InlineKeyboardButton(text=get_text(lang, 'btn_back'), callback_data="start_menu")])
     kb = InlineKeyboardMarkup(inline_keyboard=kb_buttons)
-    
     await callback.message.edit_text(text, reply_markup=kb, parse_mode="Markdown")
     await callback.answer()
 
@@ -1678,25 +1591,20 @@ async def cb_noop(callback: CallbackQuery):
 async def cb_delete_my_task(callback: CallbackQuery):
     lang = await get_user_lang(callback.from_user.id)
     task_id = int(callback.data.split(":")[1])
-    
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute(
             'SELECT id, creator_id, budget, reward, completed_count, max_executors FROM tasks WHERE id = ? AND status = ? AND creator_id = ?',
             (task_id, 'active', callback.from_user.id)
         )
         task = await cursor.fetchone()
-        
         if not task:
             await callback.answer(get_text(lang, 'err_no_task'), show_alert=True)
             return
-        
         t_id, creator_id, budget, reward, completed, max_exec = task
-        
         refund = budget - (completed * reward)
         if refund <= 0:
             await callback.answer(get_text(lang, 'task_already_done'), show_alert=True)
             return
-        
         await db.execute("UPDATE tasks SET status = 'deleted' WHERE id = ?", (task_id,))
         await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?', (refund, creator_id))
         await db.execute(
@@ -1704,7 +1612,6 @@ async def cb_delete_my_task(callback: CallbackQuery):
             (creator_id, refund, 'task_delete_refund', f'Возврат токенов при удалении задания #{task_id}')
         )
         await db.commit()
-    
     await callback.message.edit_text(
         get_text(lang, 'task_deleted', id=task_id, refund=refund),
         reply_markup=get_main_keyboard(lang=lang),
@@ -1759,11 +1666,9 @@ async def cb_task_type(callback: CallbackQuery, state: FSMContext):
         "reaction": get_text(lang, 'type_reaction'),
         "start_bot": get_text(lang, 'type_start_bot'),
     }
-    
     warning = ""
     if task_type == 'subscribe':
         warning = "\n\n" + get_text(lang, 'subscribe_warning')
-    
     await callback.message.edit_text(
         get_text(lang, 'link_prompt', type=type_map[task_type]) + warning,
         parse_mode="Markdown"
@@ -1881,11 +1786,11 @@ async def cb_view_tasks(callback: CallbackQuery):
         cursor = await db.execute('''
             SELECT t.id, t.task_type, t.link, t.reward, t.max_executors, t.completed_count, u.is_premium
             FROM tasks t LEFT JOIN users u ON t.creator_id = u.telegram_id
-            WHERE t.status = 'active' 
+            WHERE t.status = 'active'
               AND t.completed_count < t.max_executors
               AND t.creator_id != ?
               AND NOT EXISTS (
-                  SELECT 1 FROM task_executions te 
+                  SELECT 1 FROM task_executions te
                   WHERE te.task_id = t.id AND te.executor_id = ?
               )
             ORDER BY u.is_premium DESC, t.created_at DESC LIMIT 20
@@ -1947,11 +1852,7 @@ async def cb_do_task(callback: CallbackQuery, state: FSMContext):
             await callback.answer(get_text(lang, 'err_repeat'), show_alert=True)
             return
     await state.update_data(
-        task_id=task_id, 
-        creator_id=creator_id, 
-        task_type=task_type, 
-        link=link, 
-        reward=reward,
+        task_id=task_id, creator_id=creator_id, task_type=task_type, link=link, reward=reward,
         task_message_id=callback.message.message_id
     )
     type_map = {
@@ -1960,14 +1861,12 @@ async def cb_do_task(callback: CallbackQuery, state: FSMContext):
         "start_bot": get_text(lang, 'type_start_bot'),
         "special": get_text(lang, 'type_special'),
     }
-    
     if task_type == 'special':
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text=get_text(lang, 'btn_send_report'), callback_data=f"send_report:{task_id}")],
             [InlineKeyboardButton(text=get_text(lang, 'btn_cancel'), callback_data="cancel_task_execution")]
         ])
         text = get_text(lang, 'do_task_special', id=task_id, type=type_map[task_type], reward=reward, desc=description or "—")
-    
     elif task_type == 'subscribe':
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🔗 Подписаться на канал", url=link)],
@@ -1976,10 +1875,8 @@ async def cb_do_task(callback: CallbackQuery, state: FSMContext):
         ])
         text = (
             get_text(lang, 'do_task_title', id=task_id, type=type_map[task_type], reward=reward, penalty=UNSUBSCRIBE_PENALTY)
-            + "\n\n"
-            + get_text(lang, 'subscribe_warning')
+            + "\n\n" + get_text(lang, 'subscribe_warning')
         )
-    
     elif task_type == 'start_bot':
         bot_username = extract_bot_username(link)
         kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -1988,7 +1885,6 @@ async def cb_do_task(callback: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text=get_text(lang, 'btn_cancel'), callback_data="cancel_task_execution")]
         ])
         text = get_text(lang, 'do_task_start_bot', id=task_id, type=type_map[task_type], reward=reward, bot_username=bot_username)
-    
     else:
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text=get_text(lang, 'btn_go_task'), url=link)],
@@ -1996,50 +1892,41 @@ async def cb_do_task(callback: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text=get_text(lang, 'btn_cancel'), callback_data="cancel_task_execution")]
         ])
         text = get_text(lang, 'do_task_title', id=task_id, type=type_map[task_type], reward=reward, penalty=UNSUBSCRIBE_PENALTY)
-    
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
 
 
+# --- ПРОВЕРКА ЗАПУСКА БОТА ЧЕРЕЗ ПЕРЕСЫЛКУ ---
 @router.callback_query(F.data.startswith("confirm_start_bot:"))
 async def cb_confirm_start_bot(callback: CallbackQuery, state: FSMContext):
     lang = await get_user_lang(callback.from_user.id)
     task_id = int(callback.data.split(":")[1])
-    
-    # Проверить, не выполнял ли пользователь уже это задание
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute('SELECT id FROM task_executions WHERE task_id = ? AND executor_id = ?', (task_id, callback.from_user.id))
         existing = await cursor.fetchone()
         if existing:
             await callback.answer(get_text(lang, 'err_repeat'), show_alert=True)
             return
-    
     data = await state.get_data()
     if data.get('task_id') != task_id:
         await callback.answer(get_text(lang, 'err_expired'), show_alert=True)
         return
-    
     link = data['link']
     bot_username = extract_bot_username(link)
-    
-    # Сохраняем ID исходного сообщения задания для последующего редактирования
     await state.update_data(
         expected_bot_username=bot_username,
         task_message_id=callback.message.message_id
     )
-    
     # Отправляем НОВОЕ сообщение с просьбой переслать
     await bot.send_message(
         chat_id=callback.from_user.id,
         text=get_text(lang, 'forward_request', bot_username=bot_username),
         parse_mode="Markdown"
     )
-    
     await state.set_state(ConfirmBotStates.waiting_forward)
     await callback.answer()
 
 
-@router.message(ConfirmBotStates.waiting_forward)
 @router.message(ConfirmBotStates.waiting_forward)
 async def msg_confirm_start_bot(message: Message, state: FSMContext):
     lang = await get_user_lang(message.from_user.id)
@@ -2048,36 +1935,36 @@ async def msg_confirm_start_bot(message: Message, state: FSMContext):
     task_id = data.get('task_id')
     reward = data.get('reward')
     task_message_id = data.get('task_message_id')
-    
+
     if not message.forward_origin:
         await message.answer(
             get_text(lang, 'forward_not_forwarded', bot_username=expected_username),
             parse_mode="Markdown"
         )
         return
-    
+
     sender_username = None
     if hasattr(message.forward_origin, 'sender_chat') and message.forward_origin.sender_chat:
         sender_username = (message.forward_origin.sender_chat.username or "").lower()
     elif hasattr(message.forward_origin, 'sender_user') and message.forward_origin.sender_user:
         sender_username = (message.forward_origin.sender_user.username or "").lower()
-    
+
     if not sender_username:
         await message.answer(
             get_text(lang, 'forward_unknown_source', bot_username=expected_username),
             parse_mode="Markdown"
         )
         return
-    
+
     if sender_username != expected_username:
         await message.answer(
             get_text(lang, 'forward_wrong_bot', expected=expected_username),
             parse_mode="Markdown"
         )
         return
-    
+
     await state.clear()
-    
+
     async with aiosqlite.connect('bot_database.db') as db:
         await db.execute(
             'UPDATE users SET balance = balance + ?, tasks_completed = tasks_completed + 1 WHERE telegram_id = ?',
@@ -2092,7 +1979,6 @@ async def msg_confirm_start_bot(message: Message, state: FSMContext):
             (task_id, message.from_user.id, asyncio.get_event_loop().time())
         )
         await db.execute('UPDATE tasks SET completed_count = completed_count + 1 WHERE id = ?', (task_id,))
-        
         cursor = await db.execute('SELECT completed_count, max_executors, budget, reward, creator_id FROM tasks WHERE id = ?', (task_id,))
         task_info = await cursor.fetchone()
         if task_info:
@@ -2107,7 +1993,7 @@ async def msg_confirm_start_bot(message: Message, state: FSMContext):
                 except:
                     pass
         await db.commit()
-    
+
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute('SELECT referrer_id FROM users WHERE telegram_id = ?', (message.from_user.id,))
         user = await cursor.fetchone()
@@ -2121,8 +2007,8 @@ async def msg_confirm_start_bot(message: Message, state: FSMContext):
                     (referrer_id, referral_bonus, 'referral_bonus', f'10% от задания #{task_id} реферала')
                 )
                 await db.commit()
-    
-    # Редактируем ИСХОДНОЕ сообщение задания (убираем кнопки, меняем текст)
+
+    # Редактируем исходное сообщение задания (убираем кнопки)
     if task_message_id:
         try:
             await bot.edit_message_text(
@@ -2133,12 +2019,12 @@ async def msg_confirm_start_bot(message: Message, state: FSMContext):
             )
         except Exception as e:
             logger.warning(f"Failed to edit task message: {e}")
-    
-    # Отправляем НОВОЕ сообщение с подтверждением
+
     await message.answer(
         get_text(lang, 'forward_success', n=reward),
         reply_markup=get_main_keyboard(lang=lang)
     )
+
 
 @router.callback_query(F.data.startswith("send_report:"))
 async def cb_send_report(callback: CallbackQuery, state: FSMContext):
@@ -2300,24 +2186,19 @@ async def cb_reject_report(callback: CallbackQuery):
 async def cb_check_task(callback: CallbackQuery, state: FSMContext):
     lang = await get_user_lang(callback.from_user.id)
     task_id = int(callback.data.split(":")[1])
-    
-    # Проверить, не выполнял ли пользователь уже это задание
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute('SELECT id FROM task_executions WHERE task_id = ? AND executor_id = ?', (task_id, callback.from_user.id))
         existing = await cursor.fetchone()
         if existing:
             await callback.answer(get_text(lang, 'err_repeat'), show_alert=True)
             return
-    
     data = await state.get_data()
     if data.get('task_id') != task_id:
         await callback.answer(get_text(lang, 'err_expired'), show_alert=True)
         return
-    creator_id = data['creator_id']
     task_type = data['task_type']
     link = data['link']
     reward = data['reward']
-    
     if task_type == 'subscribe':
         try:
             channel_username = link.replace("https://t.me/", "").replace("http://t.me/", "").strip()
@@ -2343,7 +2224,6 @@ async def cb_check_task(callback: CallbackQuery, state: FSMContext):
             else:
                 await callback.answer(get_text(lang, 'err_check', err=error_msg[:150]), show_alert=True)
             return
-    
     async with aiosqlite.connect('bot_database.db') as db:
         await db.execute('UPDATE users SET balance = balance + ?, tasks_completed = tasks_completed + 1 WHERE telegram_id = ?', (reward, callback.from_user.id))
         await db.execute(
@@ -2934,45 +2814,35 @@ async def cb_admin_delete_task(callback: CallbackQuery, state: FSMContext):
 async def msg_admin_delete_task(message: Message, state: FSMContext):
     if message.from_user.id != ADMIN_ID:
         return
-    
     try:
         task_id = int(message.text.strip())
     except ValueError:
         await message.answer("⚠️ Введи число (ID задания)!")
         return
-    
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute(
             'SELECT id, creator_id, budget, reward, completed_count, max_executors, status FROM tasks WHERE id = ?',
             (task_id,)
         )
         task = await cursor.fetchone()
-        
         if not task:
             await message.answer("❌ Задание не найдено!")
             await state.clear()
             return
-        
         t_id, creator_id, budget, reward, completed, max_exec, status = task
-        
         if status not in ['active', 'reported']:
             await message.answer(f"⚠️ Задание уже в статусе '{status}', удалять нечего.")
             await state.clear()
             return
-        
         refund = budget - (completed * reward)
-        
         await db.execute("UPDATE tasks SET status = 'deleted' WHERE id = ?", (task_id,))
-        
         if refund > 0:
             await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?', (refund, creator_id))
             await db.execute(
                 'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
                 (creator_id, refund, 'task_delete_refund', f'Возврат токенов при удалении задания #{task_id} админом')
             )
-        
         await db.commit()
-    
     await state.clear()
     await message.answer(
         f"✅ Задание #{task_id} удалено!\n"
@@ -2986,21 +2856,17 @@ async def cb_admin_delete_all_tasks(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id != ADMIN_ID:
         await callback.answer("⛔️ Нет доступа!", show_alert=True)
         return
-    
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute("SELECT COUNT(*) FROM tasks WHERE status = 'active'")
         count = (await cursor.fetchone())[0]
-    
     if count == 0:
         await callback.message.edit_text("📋 Нет активных заданий для удаления.")
         await callback.answer()
         return
-    
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="⚠️ ДА, УДАЛИТЬ ВСЕ", callback_data="confirm_delete_all_tasks")],
         [InlineKeyboardButton(text="❌ Отмена", callback_data="admin_panel")]
     ])
-    
     await callback.message.edit_text(
         f"⚠️ *ВНИМАНИЕ!*\n\n"
         f"Ты собираешься удалить **ВСЕ** активные задания ({count} шт.).\n\n"
@@ -3018,20 +2884,15 @@ async def cb_confirm_delete_all_tasks(callback: CallbackQuery, state: FSMContext
     if callback.from_user.id != ADMIN_ID:
         await callback.answer("⛔️ Нет доступа!", show_alert=True)
         return
-    
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute("SELECT id, creator_id, budget, reward, completed_count FROM tasks WHERE status = 'active'")
         tasks = await cursor.fetchall()
-        
         total_count = len(tasks)
         total_refund = 0
-        
         for task in tasks:
             task_id, creator_id, budget, reward, completed = task
             refund = budget - (completed * reward)
-            
             await db.execute("UPDATE tasks SET status = 'deleted' WHERE id = ?", (task_id,))
-            
             if refund > 0:
                 await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?', (refund, creator_id))
                 await db.execute(
@@ -3039,9 +2900,7 @@ async def cb_confirm_delete_all_tasks(callback: CallbackQuery, state: FSMContext
                     (creator_id, refund, 'task_delete_refund', f'Возврат токенов при массовом удалении заданий (задание #{task_id})')
                 )
                 total_refund += refund
-        
         await db.commit()
-    
     await callback.message.edit_text(
         f"✅ Удалено заданий: {total_count}\n"
         f"💰 Возвращено токенов пользователям: {total_refund}"
