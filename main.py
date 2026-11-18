@@ -2001,7 +2001,6 @@ async def cb_do_task(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-# --- ПРОВЕРКА ЗАПУСКА БОТА ЧЕРЕЗ ПЕРЕСЫЛКУ ---
 @router.callback_query(F.data.startswith("confirm_start_bot:"))
 async def cb_confirm_start_bot(callback: CallbackQuery, state: FSMContext):
     lang = await get_user_lang(callback.from_user.id)
@@ -2023,15 +2022,24 @@ async def cb_confirm_start_bot(callback: CallbackQuery, state: FSMContext):
     link = data['link']
     bot_username = extract_bot_username(link)
     
-    await state.update_data(expected_bot_username=bot_username)
-    await callback.message.edit_text(
-        get_text(lang, 'forward_request', bot_username=bot_username),
+    # Сохраняем ID исходного сообщения задания для последующего редактирования
+    await state.update_data(
+        expected_bot_username=bot_username,
+        task_message_id=callback.message.message_id
+    )
+    
+    # Отправляем НОВОЕ сообщение с просьбой переслать
+    await bot.send_message(
+        chat_id=callback.from_user.id,
+        text=get_text(lang, 'forward_request', bot_username=bot_username),
         parse_mode="Markdown"
     )
+    
     await state.set_state(ConfirmBotStates.waiting_forward)
     await callback.answer()
 
 
+@router.message(ConfirmBotStates.waiting_forward)
 @router.message(ConfirmBotStates.waiting_forward)
 async def msg_confirm_start_bot(message: Message, state: FSMContext):
     lang = await get_user_lang(message.from_user.id)
@@ -2114,7 +2122,7 @@ async def msg_confirm_start_bot(message: Message, state: FSMContext):
                 )
                 await db.commit()
     
-    # Отредактировать исходное сообщение задания
+    # Редактируем ИСХОДНОЕ сообщение задания (убираем кнопки, меняем текст)
     if task_message_id:
         try:
             await bot.edit_message_text(
@@ -2126,11 +2134,11 @@ async def msg_confirm_start_bot(message: Message, state: FSMContext):
         except Exception as e:
             logger.warning(f"Failed to edit task message: {e}")
     
+    # Отправляем НОВОЕ сообщение с подтверждением
     await message.answer(
         get_text(lang, 'forward_success', n=reward),
         reply_markup=get_main_keyboard(lang=lang)
     )
-
 
 @router.callback_query(F.data.startswith("send_report:"))
 async def cb_send_report(callback: CallbackQuery, state: FSMContext):
