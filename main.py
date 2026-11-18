@@ -6,8 +6,7 @@ import aiosqlite
 from datetime import datetime, timedelta
 from dotenv import load_dotenv
 from aiogram import Bot, Dispatcher, Router, F
-from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice, \
-    MessageOriginChat
+from aiogram.types import Message, CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton, LabeledPrice, MessageOriginChat
 from aiogram.filters import CommandStart, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
@@ -35,8 +34,6 @@ TRANSLATIONS = {
         'btn_menu': "🔙 В меню",
         'btn_cancel': "❌ Отмена",
         'btn_confirm': "✅ Подтвердить",
-        'btn_delete': "🗑 Удалить #{id}",
-        'btn_delete_all': "🗑 Удалить все задания",
         'help_text': "ℹ️ *Как работает бот*\n\n📋 *Взять задание* — выполняй задания и получай токены\n➕ *Создать задание* — размести рекламу своего канала\n🗑 *Мои задания* — удали свои задания и верни токены\n💰 *Баланс* — пополняй через Telegram Stars или рубли\n👥 *Рефералы* — приглашай друзей и получай 10% от их трат\n🛎 *Поддержка* — вопросы к админу\n🎁 *Промокод* — активируй промокод и получи бонус\n\n👑 *Премиум (120 Stars/месяц):*\n• +600 токенов каждый день\n• Задания в первом ряду витрины\n• Создание заданий без выполнения 3 чужих\n• До 10 заданий в день\n• Бейдж 👑 и приоритетная поддержка\n• Скидка 20% на пополнение\n\n📌 *Правила:*\n• Минимальная награда: 100 токенов\n• Стартовый бонус: 300 токенов\n• Штраф за отписку: -200 токенов (через 48 часов)\n• Создать задание можно после выполнения 3 чужих (или с премиумом)\n\n📜 *Команды:*\n• /history — история транзакций\n• /stats — твоя статистика\n• /top — рейтинг за месяц (ТОП-3 получают премиум!)\n• /promo — активировать промокод\n• /lang — сменить язык",
         'choose_lang': "🌐 *Выбери язык*\n\nНажми кнопку для смены языка:",
         'lang_changed': "✅ Язык изменён на *{lang_name}*!",
@@ -172,10 +169,10 @@ TRANSLATIONS = {
         'btn_confirm_delete_all': "⚠️ ДА, УДАЛИТЬ ВСЕ",
         'btn_cancel_delete_all': "❌ Отмена",
         'subscribe_warning': "⚠️ *Важно для создателя задания:*\n\n"
-                             "Чтобы задание работало корректно, бот должен быть:\n"
-                             "1️⃣ Добавлен в канал как *администратор*\n"
-                             "2️⃣ Настройка «Скрыть список подписчиков» должна быть *ВЫКЛЮЧЕНА*\n\n"
-                             "Если эти условия не выполнены, задание выдаст ошибку при проверке.",
+            "Чтобы задание работало корректно, бот должен быть:\n"
+            "1️⃣ Добавлен в канал как *администратор*\n"
+            "2️⃣ Настройка «Скрыть список подписчиков» должна быть *ВЫКЛЮЧЕНА*\n\n"
+            "Если эти условия не выполнены, задание выдаст ошибку при проверке.",
     },
     'en': {
         'welcome_new': "👋 Welcome, {name}!\n\n🎁 You got a starting bonus: *{bonus} tokens*!\nYour balance: *{balance} tokens*.\n\nThis is a mutual PR bot: complete tasks, earn tokens, and promote your channel!",
@@ -194,8 +191,6 @@ TRANSLATIONS = {
         'btn_menu': "🔙 To menu",
         'btn_cancel': "❌ Cancel",
         'btn_confirm': "✅ Confirm",
-        'btn_delete': "🗑 Delete #{id}",
-        'btn_delete_all': "🗑 Delete all tasks",
         'help_text': "ℹ️ *How the bot works*\n\n📋 *Take task* — complete tasks and earn tokens\n➕ *Create task* — advertise your channel\n🗑 *My tasks* — delete your tasks and get tokens back\n💰 *Balance* — top up via Telegram Stars or rubles\n👥 *Referrals* — invite friends and get 10% of their spending\n🛎 *Support* — contact admin\n🎁 *Promo* — activate promo code for bonus\n\n👑 *Premium (120 Stars/month):*\n• +600 tokens every day\n• Tasks in first row\n• Create tasks without 3 completed\n• Up to 10 tasks per day\n• 👑 badge and priority support\n• 20% discount on top-up\n\n📌 *Rules:*\n• Min reward: 100 tokens\n• Starting bonus: 300 tokens\n• Unsubscribe penalty: -200 tokens (after 48 hours)\n• Create task after 3 completed (or with premium)\n\n📜 *Commands:*\n• /history — transaction history\n• /stats — your statistics\n• /top — monthly rating (TOP-3 get premium!)\n• /promo — activate promo code\n• /lang — change language",
         'choose_lang': "🌐 *Choose language*\n\nTap a button to change language:",
         'lang_changed': "✅ Language changed to *{lang_name}*!",
@@ -331,10 +326,10 @@ TRANSLATIONS = {
         'btn_confirm_delete_all': "⚠️ YES, DELETE ALL",
         'btn_cancel_delete_all': "❌ Cancel",
         'subscribe_warning': "⚠️ *Important for task creator:*\n\n"
-                             "For the task to work correctly, the bot must be:\n"
-                             "1️⃣ Added to the channel as an *administrator*\n"
-                             "2️⃣ The 'Hide subscribers' setting must be *DISABLED*\n\n"
-                             "If these conditions are not met, the task will show an error during verification.",
+            "For the task to work correctly, the bot must be:\n"
+            "1️⃣ Added to the channel as an *administrator*\n"
+            "2️⃣ The 'Hide subscribers' setting must be *DISABLED*\n\n"
+            "If these conditions are not met, the task will show an error during verification.",
     },
     'uk': {
         'welcome_new': "👋 Ласкаво просимо, {name}!\n\n🎁 Ти отримав стартовий бонус: *{bonus} токенів*!\nТвій баланс: *{balance} токенів*.\n\nЦе бот взаємного PR: виконуй завдання, заробляй токени та просувай свій канал!",
@@ -353,8 +348,6 @@ TRANSLATIONS = {
         'btn_menu': "🔙 В меню",
         'btn_cancel': "❌ Скасувати",
         'btn_confirm': "✅ Підтвердити",
-        'btn_delete': "🗑 Видалити #{id}",
-        'btn_delete_all': "🗑 Видалити всі завдання",
         'help_text': "ℹ️ *Як працює бот*\n\n📋 *Взяти завдання* — виконуй завдання та отримуй токени\n➕ *Створити завдання* — розмісти рекламу свого каналу\n🗑 *Мої завдання* — видали свої завдання та отримай токени назад\n💰 *Баланс* — поповнюй через Telegram Stars або гривні\n👥 *Реферали* — запрошуй друзів і отримуй 10% від їхніх витрат\n🛎 *Підтримка* — питання до адміна\n🎁 *Промокод* — активуй промокод і отримай бонус\n\n👑 *Преміум (120 Stars/місяць):*\n• +600 токенів щодня\n• Завдання в першому ряду\n• Створення завдань без виконання 3 чужих\n• До 10 завдань на день\n• Бейдж 👑 і пріоритетна підтримка\n• Знижка 20% на поповнення",
         'choose_lang': "🌐 *Обери мову*\n\nНатисни кнопку для зміни мови:",
         'lang_changed': "✅ Мову змінено на *{lang_name}*!",
@@ -490,15 +483,14 @@ TRANSLATIONS = {
         'btn_confirm_delete_all': "⚠️ ТАК, ВИДАЛИТИ ВСІ",
         'btn_cancel_delete_all': "❌ Скасувати",
         'subscribe_warning': "⚠️ *Важливо для творця завдання:*\n\n"
-                             "Щоб завдання працювало коректно, бот повинен бути:\n"
-                             "1️⃣ Доданий у канал як *адміністратор*\n"
-                             "2️⃣ Налаштування «Приховати список підписників» повинно бути *ВИМКНЕНО*\n\n"
-                             "Якщо ці умови не виконані, завдання видасть помилку під час перевірки.",
+            "Щоб завдання працювало коректно, бот повинен бути:\n"
+            "1️⃣ Доданий у канал як *адміністратор*\n"
+            "2️⃣ Налаштування «Приховати список підписників» повинно бути *ВИМКНЕНО*\n\n"
+            "Якщо ці умови не виконані, завдання видасть помилку під час перевірки.",
     }
 }
 
 DEFAULT_LANG = 'ru'
-
 
 def get_text(lang: str, key: str, **kwargs) -> str:
     if lang not in TRANSLATIONS:
@@ -576,14 +568,11 @@ class CreateTaskStates(StatesGroup):
     entering_budget = State()
     confirming = State()
 
-
 class SupportStates(StatesGroup):
     waiting_message = State()
 
-
 class PromoStates(StatesGroup):
     waiting_code = State()
-
 
 class AdminStates(StatesGroup):
     mailing_message = State()
@@ -605,18 +594,14 @@ class AdminStates(StatesGroup):
     entering_budget = State()
     delete_task_id = State()
 
-
 class PayTokensStates(StatesGroup):
     entering_amount = State()
-
 
 class LangStates(StatesGroup):
     choosing = State()
 
-
 class ReportStates(StatesGroup):
     waiting_screenshot = State()
-
 
 class ConfirmBotStates(StatesGroup):
     waiting_forward = State()
@@ -866,15 +851,13 @@ async def check_unsubscribe_penalty():
                     )
                     await db.execute(
                         'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
-                        (executor_id, -UNSUBSCRIBE_PENALTY, 'unsubscribe_penalty',
-                         f'Штраф за отписку от задания #{task_id}')
+                        (executor_id, -UNSUBSCRIBE_PENALTY, 'unsubscribe_penalty', f'Штраф за отписку от задания #{task_id}')
                     )
                     user_lang = await get_user_lang(executor_id)
                     try:
                         await bot.send_message(
                             executor_id,
-                            get_text(user_lang, 'penalty_msg', hours=PENALTY_HOURS, id=task_id,
-                                     amount=UNSUBSCRIBE_PENALTY),
+                            get_text(user_lang, 'penalty_msg', hours=PENALTY_HOURS, id=task_id, amount=UNSUBSCRIBE_PENALTY),
                             parse_mode="Markdown"
                         )
                     except:
@@ -1006,8 +989,7 @@ async def cmd_start(message: Message):
     await check_and_give_daily_bonus(message.from_user.id)
     user_lang = await get_user_lang(message.from_user.id)
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT balance, is_premium FROM users WHERE telegram_id = ?',
-                                  (message.from_user.id,))
+        cursor = await db.execute('SELECT balance, is_premium FROM users WHERE telegram_id = ?', (message.from_user.id,))
         user = await cursor.fetchone()
         balance = user[0]
         is_premium = bool(user[1])
@@ -1046,8 +1028,7 @@ async def cmd_promo(message: Message, state: FSMContext):
 async def cmd_balance(message: Message):
     lang = await get_user_lang(message.from_user.id)
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT balance, is_premium, premium_expires_at FROM users WHERE telegram_id = ?',
-                                  (message.from_user.id,))
+        cursor = await db.execute('SELECT balance, is_premium, premium_expires_at FROM users WHERE telegram_id = ?', (message.from_user.id,))
         user = await cursor.fetchone()
         balance = user[0] if user else 0
         is_premium = bool(user[1]) if user else False
@@ -1074,8 +1055,7 @@ async def cmd_balance(message: Message):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text=get_text(lang, 'btn_topup_stars'), callback_data="pay_tokens_stars")],
         [InlineKeyboardButton(text=get_text(lang, 'btn_topup_rub'), callback_data="pay_tokens_rub")],
-        [InlineKeyboardButton(text=get_text(lang, 'btn_buy_premium', stars=PREMIUM_PRICE_STARS),
-                              callback_data="buy_premium")],
+        [InlineKeyboardButton(text=get_text(lang, 'btn_buy_premium', stars=PREMIUM_PRICE_STARS), callback_data="buy_premium")],
         [InlineKeyboardButton(text=get_text(lang, 'btn_menu'), callback_data="start_menu")]
     ])
     await message.answer(text, reply_markup=kb, parse_mode="Markdown")
@@ -1089,10 +1069,16 @@ async def cmd_tasks(message: Message):
             SELECT t.id, t.task_type, t.link, t.reward, t.max_executors, t.completed_count, u.is_premium
             FROM tasks t
             LEFT JOIN users u ON t.creator_id = u.telegram_id
-            WHERE t.status = 'active' AND t.completed_count < t.max_executors
+            WHERE t.status = 'active' 
+              AND t.completed_count < t.max_executors
+              AND t.creator_id != ?
+              AND NOT EXISTS (
+                  SELECT 1 FROM task_executions te 
+                  WHERE te.task_id = t.id AND te.executor_id = ?
+              )
             ORDER BY u.is_premium DESC, t.created_at DESC
             LIMIT 20
-        ''')
+        ''', (message.from_user.id, message.from_user.id))
         tasks = await cursor.fetchall()
     if not tasks:
         await message.answer(get_text(lang, 'no_tasks'))
@@ -1109,12 +1095,9 @@ async def cmd_tasks(message: Message):
         task_id, task_type, link, reward, max_exec, completed, is_premium = task
         remaining = max_exec - completed
         mark = "👑 " if is_premium else ""
-        text += get_text(lang, 'tasks_line', mark=mark, id=task_id, type=type_map.get(task_type, task_type),
-                         reward=reward, left=remaining)
-        kb_buttons.append(
-            [InlineKeyboardButton(text=get_text(lang, 'btn_complete', id=task_id), callback_data=f"do_task:{task_id}")])
-        kb_buttons.append([InlineKeyboardButton(text=get_text(lang, 'btn_report', id=task_id),
-                                                callback_data=f"report_task:{task_id}")])
+        text += get_text(lang, 'tasks_line', mark=mark, id=task_id, type=type_map.get(task_type, task_type), reward=reward, left=remaining)
+        kb_buttons.append([InlineKeyboardButton(text=get_text(lang, 'btn_complete', id=task_id), callback_data=f"do_task:{task_id}")])
+        kb_buttons.append([InlineKeyboardButton(text=get_text(lang, 'btn_report', id=task_id), callback_data=f"report_task:{task_id}")])
     kb_buttons.append([InlineKeyboardButton(text=get_text(lang, 'btn_menu'), callback_data="start_menu")])
     kb = InlineKeyboardMarkup(inline_keyboard=kb_buttons)
     await message.answer(text, reply_markup=kb, parse_mode="Markdown")
@@ -1204,8 +1187,7 @@ async def cmd_history(message: Message):
         emoji = emoji_map.get(type, '💰')
         safe_description = escape_md(description) if description else "—"
         safe_created = escape_md(str(created_at)) if created_at else "—"
-        text += get_text(lang, 'history_line', emoji=emoji, sign=sign, amount=amount, desc=safe_description,
-                         date=safe_created)
+        text += get_text(lang, 'history_line', emoji=emoji, sign=sign, amount=amount, desc=safe_description, date=safe_created)
     await message.answer(text, parse_mode="Markdown")
 
 
@@ -1221,11 +1203,8 @@ async def cmd_stats(message: Message):
             await message.answer(get_text(lang, 'err_no_reg'))
             return
         balance, tasks_completed, is_premium, premium_expires, created_at = user
-        tasks_created = (await (
-            await db.execute('SELECT COUNT(*) FROM tasks WHERE creator_id = ?', (message.from_user.id,))).fetchone())[0]
-        referrals = (await (
-            await db.execute('SELECT COUNT(*) FROM users WHERE referrer_id = ?', (message.from_user.id,))).fetchone())[
-            0]
+        tasks_created = (await (await db.execute('SELECT COUNT(*) FROM tasks WHERE creator_id = ?', (message.from_user.id,))).fetchone())[0]
+        referrals = (await (await db.execute('SELECT COUNT(*) FROM users WHERE referrer_id = ?', (message.from_user.id,))).fetchone())[0]
         total_earned = (await (await db.execute(
             "SELECT SUM(amount) FROM transactions WHERE user_id = ? AND type IN ('task_complete', 'bonus', 'referral_bonus', 'premium_daily', 'special_task_approved')",
             (message.from_user.id,)
@@ -1234,8 +1213,7 @@ async def cmd_stats(message: Message):
             "SELECT SUM(ABS(amount)) FROM transactions WHERE user_id = ? AND type IN ('task_create', 'unsubscribe_penalty')",
             (message.from_user.id,)
         )).fetchone())[0] or 0
-    premium_badge = " 👑" if (
-                is_premium and premium_expires and datetime.fromisoformat(premium_expires) > datetime.now()) else ""
+    premium_badge = " 👑" if (is_premium and premium_expires and datetime.fromisoformat(premium_expires) > datetime.now()) else ""
     prem_info = ""
     if is_premium and premium_expires:
         expires = datetime.fromisoformat(premium_expires)
@@ -1288,7 +1266,7 @@ async def cmd_top(message: Message):
     medals = ["🥇", "🥈", "🥉"]
     for i, (telegram_id, username, total_earned) in enumerate(top_users):
         username_display = f"@{escape_md(username)}" if username else "Аноним"
-        medal = medals[i] if i < 3 else f"{i + 1}."
+        medal = medals[i] if i < 3 else f"{i+1}."
         if telegram_id == message.from_user.id:
             text += get_text(lang, 'top_line_you', medal=medal, name=username_display, n=total_earned)
         else:
@@ -1400,8 +1378,7 @@ async def msg_activate_promo(message: Message, state: FSMContext):
     lang = await get_user_lang(message.from_user.id)
     promo_code = message.text.strip().upper()
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT id, amount, max_uses, used_count FROM promo_codes WHERE code = ?',
-                                  (promo_code,))
+        cursor = await db.execute('SELECT id, amount, max_uses, used_count FROM promo_codes WHERE code = ?', (promo_code,))
         promo = await cursor.fetchone()
         if not promo:
             await message.answer(get_text(lang, 'promo_invalid'))
@@ -1439,8 +1416,7 @@ async def msg_activate_promo(message: Message, state: FSMContext):
 async def cb_balance(callback: CallbackQuery):
     lang = await get_user_lang(callback.from_user.id)
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT balance, is_premium, premium_expires_at FROM users WHERE telegram_id = ?',
-                                  (callback.from_user.id,))
+        cursor = await db.execute('SELECT balance, is_premium, premium_expires_at FROM users WHERE telegram_id = ?', (callback.from_user.id,))
         user = await cursor.fetchone()
         balance = user[0] if user else 0
         is_premium = bool(user[1]) if user else False
@@ -1467,8 +1443,7 @@ async def cb_balance(callback: CallbackQuery):
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text=get_text(lang, 'btn_topup_stars'), callback_data="pay_tokens_stars")],
         [InlineKeyboardButton(text=get_text(lang, 'btn_topup_rub'), callback_data="pay_tokens_rub")],
-        [InlineKeyboardButton(text=get_text(lang, 'btn_buy_premium', stars=PREMIUM_PRICE_STARS),
-                              callback_data="buy_premium")],
+        [InlineKeyboardButton(text=get_text(lang, 'btn_buy_premium', stars=PREMIUM_PRICE_STARS), callback_data="buy_premium")],
         [InlineKeyboardButton(text=get_text(lang, 'btn_back'), callback_data="start_menu")]
     ])
     await callback.message.edit_text(text, reply_markup=kb, parse_mode="Markdown")
@@ -1479,8 +1454,7 @@ async def cb_balance(callback: CallbackQuery):
 async def cb_pay_tokens_stars(callback: CallbackQuery, state: FSMContext):
     lang = await get_user_lang(callback.from_user.id)
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT is_premium, premium_expires_at FROM users WHERE telegram_id = ?',
-                                  (callback.from_user.id,))
+        cursor = await db.execute('SELECT is_premium, premium_expires_at FROM users WHERE telegram_id = ?', (callback.from_user.id,))
         user = await cursor.fetchone()
         is_premium = bool(user[0]) if user else False
         premium_expires = user[1] if user else None
@@ -1514,8 +1488,7 @@ async def msg_pay_tokens_amount(message: Message, state: FSMContext):
         await message.answer(get_text(lang, 'balance_stars_min', min=MIN_TOKENS_PURCHASE))
         return
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT is_premium, premium_expires_at FROM users WHERE telegram_id = ?',
-                                  (message.from_user.id,))
+        cursor = await db.execute('SELECT is_premium, premium_expires_at FROM users WHERE telegram_id = ?', (message.from_user.id,))
         user = await cursor.fetchone()
         is_premium = bool(user[0]) if user else False
         premium_expires = user[1] if user else None
@@ -1526,8 +1499,7 @@ async def msg_pay_tokens_amount(message: Message, state: FSMContext):
     stars_needed = calculate_stars_for_tokens(tokens, is_premium_active)
     rub_equivalent = calculate_rub_for_tokens(tokens)
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=get_text(lang, 'btn_pay', stars=stars_needed),
-                              callback_data=f"confirm_pay_stars:{tokens}:{stars_needed}")],
+        [InlineKeyboardButton(text=get_text(lang, 'btn_pay', stars=stars_needed), callback_data=f"confirm_pay_stars:{tokens}:{stars_needed}")],
         [InlineKeyboardButton(text=get_text(lang, 'btn_cancel'), callback_data="balance")]
     ])
     await message.answer(
@@ -1578,8 +1550,7 @@ async def cb_support_rub(callback: CallbackQuery, state: FSMContext):
 async def cb_buy_premium(callback: CallbackQuery):
     lang = await get_user_lang(callback.from_user.id)
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT is_premium, premium_expires_at FROM users WHERE telegram_id = ?',
-                                  (callback.from_user.id,))
+        cursor = await db.execute('SELECT is_premium, premium_expires_at FROM users WHERE telegram_id = ?', (callback.from_user.id,))
         user = await cursor.fetchone()
         is_premium = bool(user[0]) if user else False
         premium_expires = user[1] if user else None
@@ -1590,8 +1561,7 @@ async def cb_buy_premium(callback: CallbackQuery):
     text = get_text(lang, 'premium_title', stars=PREMIUM_PRICE_STARS, daily=DAILY_PREMIUM_BONUS,
                     max=PREMIUM_TASKS_PER_DAY, days=PREMIUM_DURATION_DAYS)
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=get_text(lang, 'btn_pay_premium', stars=PREMIUM_PRICE_STARS),
-                              callback_data="pay_premium_stars")],
+        [InlineKeyboardButton(text=get_text(lang, 'btn_pay_premium', stars=PREMIUM_PRICE_STARS), callback_data="pay_premium_stars")],
         [InlineKeyboardButton(text=get_text(lang, 'btn_back'), callback_data="balance")]
     ])
     await callback.message.edit_text(text, reply_markup=kb, parse_mode="Markdown")
@@ -1620,15 +1590,12 @@ async def msg_successful_payment(message: Message):
         user_id = int(payload.split("_")[1])
         async with aiosqlite.connect('bot_database.db') as db:
             expires_at = (datetime.now() + timedelta(days=PREMIUM_DURATION_DAYS)).isoformat()
-            await db.execute('UPDATE users SET is_premium = 1, premium_expires_at = ? WHERE telegram_id = ?',
-                             (expires_at, user_id))
-            await db.execute('INSERT INTO premium_purchases (user_id, amount_stars, duration_days) VALUES (?, ?, ?)',
-                             (user_id, PREMIUM_PRICE_STARS, PREMIUM_DURATION_DAYS))
+            await db.execute('UPDATE users SET is_premium = 1, premium_expires_at = ? WHERE telegram_id = ?', (expires_at, user_id))
+            await db.execute('INSERT INTO premium_purchases (user_id, amount_stars, duration_days) VALUES (?, ?, ?)', (user_id, PREMIUM_PRICE_STARS, PREMIUM_DURATION_DAYS))
             await db.commit()
         expires = datetime.fromisoformat(expires_at)
         await message.answer(
-            get_text(user_lang, 'premium_activated', date=escape_md(expires.strftime('%d.%m.%Y %H:%M')),
-                     daily=DAILY_PREMIUM_BONUS),
+            get_text(user_lang, 'premium_activated', date=escape_md(expires.strftime('%d.%m.%Y %H:%M')), daily=DAILY_PREMIUM_BONUS),
             reply_markup=get_main_keyboard(True, user_lang), parse_mode="Markdown"
         )
     elif payload.startswith("tokens_"):
@@ -1660,31 +1627,30 @@ async def cb_my_tasks(callback: CallbackQuery):
             ORDER BY id DESC
         ''', (callback.from_user.id,))
         tasks = await cursor.fetchall()
-
+    
     if not tasks:
         await callback.message.edit_text(get_text(lang, 'no_my_tasks'))
         await callback.answer()
         return
-
+    
     type_map = {
         "subscribe": get_text(lang, 'type_names_subscribe'),
         "reaction": get_text(lang, 'type_names_reaction'),
         "start_bot": get_text(lang, 'type_names_start_bot'),
         "special": get_text(lang, 'type_names_special'),
     }
-
+    
     text = get_text(lang, 'my_tasks_title')
     kb_buttons = []
-
+    
     for task in tasks:
         task_id, task_type, reward, budget, max_exec, completed = task
         refund = budget - (completed * reward)
         type_name = type_map.get(task_type, task_type)
-
-        text += get_text(lang, 'my_task_line', id=task_id, type=type_name, reward=reward, done=completed, max=max_exec,
-                         refund=refund)
+        
+        text += get_text(lang, 'my_task_line', id=task_id, type=type_name, reward=reward, done=completed, max=max_exec, refund=refund)
         text += "\n"
-
+        
         if refund > 0:
             kb_buttons.append([InlineKeyboardButton(
                 text=get_text(lang, 'btn_delete', id=task_id) + f" (+{refund}🪙)",
@@ -1695,10 +1661,10 @@ async def cb_my_tasks(callback: CallbackQuery):
                 text=f"🔒 #{task_id} (завершено)",
                 callback_data="noop"
             )])
-
+    
     kb_buttons.append([InlineKeyboardButton(text=get_text(lang, 'btn_back'), callback_data="start_menu")])
     kb = InlineKeyboardMarkup(inline_keyboard=kb_buttons)
-
+    
     await callback.message.edit_text(text, reply_markup=kb, parse_mode="Markdown")
     await callback.answer()
 
@@ -1712,25 +1678,25 @@ async def cb_noop(callback: CallbackQuery):
 async def cb_delete_my_task(callback: CallbackQuery):
     lang = await get_user_lang(callback.from_user.id)
     task_id = int(callback.data.split(":")[1])
-
+    
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute(
             'SELECT id, creator_id, budget, reward, completed_count, max_executors FROM tasks WHERE id = ? AND status = ? AND creator_id = ?',
             (task_id, 'active', callback.from_user.id)
         )
         task = await cursor.fetchone()
-
+        
         if not task:
             await callback.answer(get_text(lang, 'err_no_task'), show_alert=True)
             return
-
+        
         t_id, creator_id, budget, reward, completed, max_exec = task
-
+        
         refund = budget - (completed * reward)
         if refund <= 0:
             await callback.answer(get_text(lang, 'task_already_done'), show_alert=True)
             return
-
+        
         await db.execute("UPDATE tasks SET status = 'deleted' WHERE id = ?", (task_id,))
         await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?', (refund, creator_id))
         await db.execute(
@@ -1738,7 +1704,7 @@ async def cb_delete_my_task(callback: CallbackQuery):
             (creator_id, refund, 'task_delete_refund', f'Возврат токенов при удалении задания #{task_id}')
         )
         await db.commit()
-
+    
     await callback.message.edit_text(
         get_text(lang, 'task_deleted', id=task_id, refund=refund),
         reply_markup=get_main_keyboard(lang=lang),
@@ -1783,7 +1749,6 @@ async def cb_create_task(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-# === ИЗМЕНЕННАЯ ФУНКЦИЯ: добавлено предупреждение для типа "subscribe" ===
 @router.callback_query(F.data.startswith("task_type:"), CreateTaskStates.choosing_type)
 async def cb_task_type(callback: CallbackQuery, state: FSMContext):
     lang = await get_user_lang(callback.from_user.id)
@@ -1794,12 +1759,11 @@ async def cb_task_type(callback: CallbackQuery, state: FSMContext):
         "reaction": get_text(lang, 'type_reaction'),
         "start_bot": get_text(lang, 'type_start_bot'),
     }
-
-    # Добавляем предупреждение для типа "subscribe"
+    
     warning = ""
     if task_type == 'subscribe':
         warning = "\n\n" + get_text(lang, 'subscribe_warning')
-
+    
     await callback.message.edit_text(
         get_text(lang, 'link_prompt', type=type_map[task_type]) + warning,
         parse_mode="Markdown"
@@ -1889,10 +1853,8 @@ async def cb_confirm_task(callback: CallbackQuery, state: FSMContext):
         await db.execute('''
             INSERT INTO tasks (creator_id, task_type, link, reward, budget, max_executors, completed_count, status)
             VALUES (?, ?, ?, ?, ?, ?, 0, 'active')
-        ''', (callback.from_user.id, data['task_type'], data['link'], data['reward'], data['budget'],
-              data['max_executors']))
-        await db.execute('UPDATE users SET balance = balance - ? WHERE telegram_id = ?',
-                         (data['budget'], callback.from_user.id))
+        ''', (callback.from_user.id, data['task_type'], data['link'], data['reward'], data['budget'], data['max_executors']))
+        await db.execute('UPDATE users SET balance = balance - ? WHERE telegram_id = ?', (data['budget'], callback.from_user.id))
         await db.execute(
             'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
             (callback.from_user.id, -data['budget'], 'task_create', f"Создание задания #{data['task_type']}")
@@ -1919,9 +1881,15 @@ async def cb_view_tasks(callback: CallbackQuery):
         cursor = await db.execute('''
             SELECT t.id, t.task_type, t.link, t.reward, t.max_executors, t.completed_count, u.is_premium
             FROM tasks t LEFT JOIN users u ON t.creator_id = u.telegram_id
-            WHERE t.status = 'active' AND t.completed_count < t.max_executors
+            WHERE t.status = 'active' 
+              AND t.completed_count < t.max_executors
+              AND t.creator_id != ?
+              AND NOT EXISTS (
+                  SELECT 1 FROM task_executions te 
+                  WHERE te.task_id = t.id AND te.executor_id = ?
+              )
             ORDER BY u.is_premium DESC, t.created_at DESC LIMIT 20
-        ''')
+        ''', (callback.from_user.id, callback.from_user.id))
         tasks = await cursor.fetchall()
     if not tasks:
         await callback.message.edit_text(get_text(lang, 'no_tasks'))
@@ -1939,19 +1907,15 @@ async def cb_view_tasks(callback: CallbackQuery):
         task_id, task_type, link, reward, max_exec, completed, is_premium = task
         remaining = max_exec - completed
         mark = "👑 " if is_premium else ""
-        text += get_text(lang, 'tasks_line', mark=mark, id=task_id, type=type_map.get(task_type, task_type),
-                         reward=reward, left=remaining)
-        kb_buttons.append(
-            [InlineKeyboardButton(text=get_text(lang, 'btn_complete', id=task_id), callback_data=f"do_task:{task_id}")])
-        kb_buttons.append([InlineKeyboardButton(text=get_text(lang, 'btn_report', id=task_id),
-                                                callback_data=f"report_task:{task_id}")])
+        text += get_text(lang, 'tasks_line', mark=mark, id=task_id, type=type_map.get(task_type, task_type), reward=reward, left=remaining)
+        kb_buttons.append([InlineKeyboardButton(text=get_text(lang, 'btn_complete', id=task_id), callback_data=f"do_task:{task_id}")])
+        kb_buttons.append([InlineKeyboardButton(text=get_text(lang, 'btn_report', id=task_id), callback_data=f"report_task:{task_id}")])
     kb_buttons.append([InlineKeyboardButton(text=get_text(lang, 'btn_back'), callback_data="start_menu")])
     kb = InlineKeyboardMarkup(inline_keyboard=kb_buttons)
     await callback.message.edit_text(text, reply_markup=kb, parse_mode="Markdown")
     await callback.answer()
 
 
-# === ИЗМЕНЕННАЯ ФУНКЦИЯ: добавлено предупреждение при выполнении задания типа "subscribe" ===
 @router.callback_query(F.data.startswith("do_task:"))
 async def cb_do_task(callback: CallbackQuery, state: FSMContext):
     lang = await get_user_lang(callback.from_user.id)
@@ -1977,42 +1941,45 @@ async def cb_do_task(callback: CallbackQuery, state: FSMContext):
         if creator_id == callback.from_user.id:
             await callback.answer(get_text(lang, 'err_own'), show_alert=True)
             return
-        cursor = await db.execute('SELECT id FROM task_executions WHERE task_id = ? AND executor_id = ?',
-                                  (task_id, callback.from_user.id))
+        cursor = await db.execute('SELECT id FROM task_executions WHERE task_id = ? AND executor_id = ?', (task_id, callback.from_user.id))
         existing = await cursor.fetchone()
         if existing:
             await callback.answer(get_text(lang, 'err_repeat'), show_alert=True)
             return
-    await state.update_data(task_id=task_id, creator_id=creator_id, task_type=task_type, link=link, reward=reward)
+    await state.update_data(
+        task_id=task_id, 
+        creator_id=creator_id, 
+        task_type=task_type, 
+        link=link, 
+        reward=reward,
+        task_message_id=callback.message.message_id
+    )
     type_map = {
         "subscribe": get_text(lang, 'type_subscribe'),
         "reaction": get_text(lang, 'type_reaction'),
         "start_bot": get_text(lang, 'type_start_bot'),
         "special": get_text(lang, 'type_special'),
     }
-
+    
     if task_type == 'special':
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text=get_text(lang, 'btn_send_report'), callback_data=f"send_report:{task_id}")],
             [InlineKeyboardButton(text=get_text(lang, 'btn_cancel'), callback_data="cancel_task_execution")]
         ])
-        text = get_text(lang, 'do_task_special', id=task_id, type=type_map[task_type], reward=reward,
-                        desc=description or "—")
-
+        text = get_text(lang, 'do_task_special', id=task_id, type=type_map[task_type], reward=reward, desc=description or "—")
+    
     elif task_type == 'subscribe':
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text="🔗 Подписаться на канал", url=link)],
             [InlineKeyboardButton(text=get_text(lang, 'btn_check'), callback_data=f"check_task:{task_id}")],
             [InlineKeyboardButton(text=get_text(lang, 'btn_cancel'), callback_data="cancel_task_execution")]
         ])
-        # Основное описание задания + предупреждение
         text = (
-                get_text(lang, 'do_task_title', id=task_id, type=type_map[task_type], reward=reward,
-                         penalty=UNSUBSCRIBE_PENALTY)
-                + "\n\n"
-                + get_text(lang, 'subscribe_warning')
+            get_text(lang, 'do_task_title', id=task_id, type=type_map[task_type], reward=reward, penalty=UNSUBSCRIBE_PENALTY)
+            + "\n\n"
+            + get_text(lang, 'subscribe_warning')
         )
-
+    
     elif task_type == 'start_bot':
         bot_username = extract_bot_username(link)
         kb = InlineKeyboardMarkup(inline_keyboard=[
@@ -2020,18 +1987,16 @@ async def cb_do_task(callback: CallbackQuery, state: FSMContext):
             [InlineKeyboardButton(text=get_text(lang, 'btn_check'), callback_data=f"confirm_start_bot:{task_id}")],
             [InlineKeyboardButton(text=get_text(lang, 'btn_cancel'), callback_data="cancel_task_execution")]
         ])
-        text = get_text(lang, 'do_task_start_bot', id=task_id, type=type_map[task_type], reward=reward,
-                        bot_username=bot_username)
-
+        text = get_text(lang, 'do_task_start_bot', id=task_id, type=type_map[task_type], reward=reward, bot_username=bot_username)
+    
     else:
         kb = InlineKeyboardMarkup(inline_keyboard=[
             [InlineKeyboardButton(text=get_text(lang, 'btn_go_task'), url=link)],
             [InlineKeyboardButton(text=get_text(lang, 'btn_check'), callback_data=f"check_task:{task_id}")],
             [InlineKeyboardButton(text=get_text(lang, 'btn_cancel'), callback_data="cancel_task_execution")]
         ])
-        text = get_text(lang, 'do_task_title', id=task_id, type=type_map[task_type], reward=reward,
-                        penalty=UNSUBSCRIBE_PENALTY)
-
+        text = get_text(lang, 'do_task_title', id=task_id, type=type_map[task_type], reward=reward, penalty=UNSUBSCRIBE_PENALTY)
+    
     await callback.message.edit_text(text, reply_markup=kb)
     await callback.answer()
 
@@ -2041,14 +2006,23 @@ async def cb_do_task(callback: CallbackQuery, state: FSMContext):
 async def cb_confirm_start_bot(callback: CallbackQuery, state: FSMContext):
     lang = await get_user_lang(callback.from_user.id)
     task_id = int(callback.data.split(":")[1])
+    
+    # Проверить, не выполнял ли пользователь уже это задание
+    async with aiosqlite.connect('bot_database.db') as db:
+        cursor = await db.execute('SELECT id FROM task_executions WHERE task_id = ? AND executor_id = ?', (task_id, callback.from_user.id))
+        existing = await cursor.fetchone()
+        if existing:
+            await callback.answer(get_text(lang, 'err_repeat'), show_alert=True)
+            return
+    
     data = await state.get_data()
     if data.get('task_id') != task_id:
         await callback.answer(get_text(lang, 'err_expired'), show_alert=True)
         return
-
+    
     link = data['link']
     bot_username = extract_bot_username(link)
-
+    
     await state.update_data(expected_bot_username=bot_username)
     await callback.message.edit_text(
         get_text(lang, 'forward_request', bot_username=bot_username),
@@ -2065,36 +2039,37 @@ async def msg_confirm_start_bot(message: Message, state: FSMContext):
     expected_username = data.get('expected_bot_username', '').lower()
     task_id = data.get('task_id')
     reward = data.get('reward')
-
+    task_message_id = data.get('task_message_id')
+    
     if not message.forward_origin:
         await message.answer(
             get_text(lang, 'forward_not_forwarded', bot_username=expected_username),
             parse_mode="Markdown"
         )
         return
-
+    
     sender_username = None
     if hasattr(message.forward_origin, 'sender_chat') and message.forward_origin.sender_chat:
         sender_username = (message.forward_origin.sender_chat.username or "").lower()
     elif hasattr(message.forward_origin, 'sender_user') and message.forward_origin.sender_user:
         sender_username = (message.forward_origin.sender_user.username or "").lower()
-
+    
     if not sender_username:
         await message.answer(
             get_text(lang, 'forward_unknown_source', bot_username=expected_username),
             parse_mode="Markdown"
         )
         return
-
+    
     if sender_username != expected_username:
         await message.answer(
             get_text(lang, 'forward_wrong_bot', expected=expected_username),
             parse_mode="Markdown"
         )
         return
-
+    
     await state.clear()
-
+    
     async with aiosqlite.connect('bot_database.db') as db:
         await db.execute(
             'UPDATE users SET balance = balance + ?, tasks_completed = tasks_completed + 1 WHERE telegram_id = ?',
@@ -2102,33 +2077,29 @@ async def msg_confirm_start_bot(message: Message, state: FSMContext):
         )
         await db.execute(
             'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
-            (message.from_user.id, reward, 'task_complete',
-             f'Выполнение задания #{task_id} (запуск бота @{expected_username})')
+            (message.from_user.id, reward, 'task_complete', f'Выполнение задания #{task_id} (запуск бота @{expected_username})')
         )
         await db.execute(
             'INSERT INTO task_executions (task_id, executor_id, completed_at) VALUES (?, ?, ?)',
             (task_id, message.from_user.id, asyncio.get_event_loop().time())
         )
         await db.execute('UPDATE tasks SET completed_count = completed_count + 1 WHERE id = ?', (task_id,))
-
-        cursor = await db.execute(
-            'SELECT completed_count, max_executors, budget, reward, creator_id FROM tasks WHERE id = ?', (task_id,))
+        
+        cursor = await db.execute('SELECT completed_count, max_executors, budget, reward, creator_id FROM tasks WHERE id = ?', (task_id,))
         task_info = await cursor.fetchone()
         if task_info:
             completed_count, max_executors, budget, task_reward, creator_id = task_info
             if completed_count >= max_executors:
                 remainder = budget - (max_executors * task_reward)
                 if remainder > 0:
-                    await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?',
-                                     (remainder, creator_id))
+                    await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?', (remainder, creator_id))
                 await db.execute('UPDATE tasks SET status = ? WHERE id = ?', ('completed', task_id))
                 try:
-                    await bot.send_message(creator_id,
-                                           f"✅ Твоё задание #{task_id} полностью выполнено!\nВернулось: {remainder} токенов")
+                    await bot.send_message(creator_id, f"✅ Твоё задание #{task_id} полностью выполнено!\nВернулось: {remainder} токенов")
                 except:
                     pass
         await db.commit()
-
+    
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute('SELECT referrer_id FROM users WHERE telegram_id = ?', (message.from_user.id,))
         user = await cursor.fetchone()
@@ -2136,14 +2107,25 @@ async def msg_confirm_start_bot(message: Message, state: FSMContext):
         if referrer_id:
             referral_bonus = int(reward * 0.1)
             if referral_bonus > 0:
-                await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?',
-                                 (referral_bonus, referrer_id))
+                await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?', (referral_bonus, referrer_id))
                 await db.execute(
                     'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
                     (referrer_id, referral_bonus, 'referral_bonus', f'10% от задания #{task_id} реферала')
                 )
                 await db.commit()
-
+    
+    # Отредактировать исходное сообщение задания
+    if task_message_id:
+        try:
+            await bot.edit_message_text(
+                chat_id=message.from_user.id,
+                message_id=task_message_id,
+                text=f"✅ Задание #{task_id} выполнено!\n\nТебе начислено: {reward} токенов",
+                reply_markup=None
+            )
+        except Exception as e:
+            logger.warning(f"Failed to edit task message: {e}")
+    
     await message.answer(
         get_text(lang, 'forward_success', n=reward),
         reply_markup=get_main_keyboard(lang=lang)
@@ -2159,8 +2141,7 @@ async def cb_send_report(callback: CallbackQuery, state: FSMContext):
         await callback.answer(get_text(lang, 'err_expired'), show_alert=True)
         return
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT id, status FROM special_submissions WHERE task_id = ? AND user_id = ?',
-                                  (task_id, callback.from_user.id))
+        cursor = await db.execute('SELECT id, status FROM special_submissions WHERE task_id = ? AND user_id = ?', (task_id, callback.from_user.id))
         existing = await cursor.fetchone()
         if existing:
             sub_id, sub_status = existing
@@ -2201,8 +2182,7 @@ async def msg_report_screenshot(message: Message, state: FSMContext):
         submission_id = cursor.lastrowid
         await db.commit()
     kb = InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text=f"✅ Одобрить и начислить {reward} токенов",
-                              callback_data=f"approve_report:{submission_id}")],
+        [InlineKeyboardButton(text=f"✅ Одобрить и начислить {reward} токенов", callback_data=f"approve_report:{submission_id}")],
         [InlineKeyboardButton(text="❌ Отклонить", callback_data=f"reject_report:{submission_id}")]
     ])
     await bot.send_photo(
@@ -2231,8 +2211,7 @@ async def cb_approve_report(callback: CallbackQuery):
         return
     submission_id = int(callback.data.split(":")[1])
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT task_id, user_id, status FROM special_submissions WHERE id = ?',
-                                  (submission_id,))
+        cursor = await db.execute('SELECT task_id, user_id, status FROM special_submissions WHERE id = ?', (submission_id,))
         submission = await cursor.fetchone()
         if not submission:
             await callback.answer("❌ Отчёт не найден!", show_alert=True)
@@ -2245,16 +2224,13 @@ async def cb_approve_report(callback: CallbackQuery):
         task = await cursor.fetchone()
         reward = task[0] if task else 0
         await db.execute('UPDATE special_submissions SET status = ? WHERE id = ?', ('approved', submission_id))
-        await db.execute(
-            'UPDATE users SET balance = balance + ?, tasks_completed = tasks_completed + 1 WHERE telegram_id = ?',
-            (reward, user_id))
+        await db.execute('UPDATE users SET balance = balance + ?, tasks_completed = tasks_completed + 1 WHERE telegram_id = ?', (reward, user_id))
         await db.execute(
             'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
             (user_id, reward, 'special_task_approved', f'Одобрен отчёт по особому заданию #{task_id}')
         )
         await db.execute('UPDATE tasks SET completed_count = completed_count + 1 WHERE id = ?', (task_id,))
-        cursor = await db.execute(
-            'SELECT completed_count, max_executors, budget, reward, creator_id FROM tasks WHERE id = ?', (task_id,))
+        cursor = await db.execute('SELECT completed_count, max_executors, budget, reward, creator_id FROM tasks WHERE id = ?', (task_id,))
         task_info = await cursor.fetchone()
         completed_count = max_executors = budget = task_reward = creator_id = 0
         if task_info:
@@ -2262,12 +2238,10 @@ async def cb_approve_report(callback: CallbackQuery):
             if completed_count >= max_executors:
                 remainder = budget - (max_executors * task_reward)
                 if remainder > 0:
-                    await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?',
-                                     (remainder, creator_id))
+                    await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?', (remainder, creator_id))
                 await db.execute('UPDATE tasks SET status = ? WHERE id = ?', ('completed', task_id))
                 try:
-                    await bot.send_message(creator_id,
-                                           f"✅ Твоё особое задание #{task_id} полностью выполнено!\nВернулось: {remainder} токенов")
+                    await bot.send_message(creator_id, f"✅ Твоё особое задание #{task_id} полностью выполнено!\nВернулось: {remainder} токенов")
                 except:
                     pass
         await db.commit()
@@ -2291,8 +2265,7 @@ async def cb_reject_report(callback: CallbackQuery):
         return
     submission_id = int(callback.data.split(":")[1])
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT task_id, user_id, status FROM special_submissions WHERE id = ?',
-                                  (submission_id,))
+        cursor = await db.execute('SELECT task_id, user_id, status FROM special_submissions WHERE id = ?', (submission_id,))
         submission = await cursor.fetchone()
         if not submission:
             await callback.answer("❌ Отчёт не найден!", show_alert=True)
@@ -2319,6 +2292,15 @@ async def cb_reject_report(callback: CallbackQuery):
 async def cb_check_task(callback: CallbackQuery, state: FSMContext):
     lang = await get_user_lang(callback.from_user.id)
     task_id = int(callback.data.split(":")[1])
+    
+    # Проверить, не выполнял ли пользователь уже это задание
+    async with aiosqlite.connect('bot_database.db') as db:
+        cursor = await db.execute('SELECT id FROM task_executions WHERE task_id = ? AND executor_id = ?', (task_id, callback.from_user.id))
+        existing = await cursor.fetchone()
+        if existing:
+            await callback.answer(get_text(lang, 'err_repeat'), show_alert=True)
+            return
+    
     data = await state.get_data()
     if data.get('task_id') != task_id:
         await callback.answer(get_text(lang, 'err_expired'), show_alert=True)
@@ -2327,7 +2309,7 @@ async def cb_check_task(callback: CallbackQuery, state: FSMContext):
     task_type = data['task_type']
     link = data['link']
     reward = data['reward']
-
+    
     if task_type == 'subscribe':
         try:
             channel_username = link.replace("https://t.me/", "").replace("http://t.me/", "").strip()
@@ -2353,11 +2335,9 @@ async def cb_check_task(callback: CallbackQuery, state: FSMContext):
             else:
                 await callback.answer(get_text(lang, 'err_check', err=error_msg[:150]), show_alert=True)
             return
-
+    
     async with aiosqlite.connect('bot_database.db') as db:
-        await db.execute(
-            'UPDATE users SET balance = balance + ?, tasks_completed = tasks_completed + 1 WHERE telegram_id = ?',
-            (reward, callback.from_user.id))
+        await db.execute('UPDATE users SET balance = balance + ?, tasks_completed = tasks_completed + 1 WHERE telegram_id = ?', (reward, callback.from_user.id))
         await db.execute(
             'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
             (callback.from_user.id, reward, 'task_complete', f'Выполнение задания #{task_id}')
@@ -2367,23 +2347,20 @@ async def cb_check_task(callback: CallbackQuery, state: FSMContext):
             (task_id, callback.from_user.id, asyncio.get_event_loop().time())
         )
         await db.execute('UPDATE tasks SET completed_count = completed_count + 1 WHERE id = ?', (task_id,))
-        cursor = await db.execute(
-            'SELECT completed_count, max_executors, budget, reward, creator_id FROM tasks WHERE id = ?', (task_id,))
+        cursor = await db.execute('SELECT completed_count, max_executors, budget, reward, creator_id FROM tasks WHERE id = ?', (task_id,))
         task_info = await cursor.fetchone()
         completed_count, max_executors, budget, task_reward, creator_id = task_info
         if completed_count >= max_executors:
             remainder = budget - (max_executors * task_reward)
             if remainder > 0:
-                await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?',
-                                 (remainder, creator_id))
+                await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?', (remainder, creator_id))
                 await db.execute(
                     'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
                     (creator_id, remainder, 'task_remainder', f'Возврат остатка по заданию #{task_id}')
                 )
             await db.execute('UPDATE tasks SET status = ? WHERE id = ?', ('completed', task_id))
             try:
-                await bot.send_message(creator_id,
-                                       f"✅ Твоё задание #{task_id} полностью выполнено!\nВернулось: {remainder} токенов")
+                await bot.send_message(creator_id, f"✅ Твоё задание #{task_id} полностью выполнено!\nВернулось: {remainder} токенов")
             except:
                 pass
         await db.commit()
@@ -2394,8 +2371,7 @@ async def cb_check_task(callback: CallbackQuery, state: FSMContext):
         if referrer_id:
             referral_bonus = int(reward * 0.1)
             if referral_bonus > 0:
-                await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?',
-                                 (referral_bonus, referrer_id))
+                await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?', (referral_bonus, referrer_id))
                 await db.execute(
                     'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
                     (referrer_id, referral_bonus, 'referral_bonus', f'10% от задания #{task_id} реферала')
@@ -2419,8 +2395,7 @@ async def cb_report_task(callback: CallbackQuery):
     lang = await get_user_lang(callback.from_user.id)
     task_id = int(callback.data.split(":")[1])
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT id FROM task_reports WHERE task_id = ? AND reporter_id = ?',
-                                  (task_id, callback.from_user.id))
+        cursor = await db.execute('SELECT id FROM task_reports WHERE task_id = ? AND reporter_id = ?', (task_id, callback.from_user.id))
         existing = await cursor.fetchone()
         if existing:
             await callback.answer(get_text(lang, 'report_dup'), show_alert=True)
@@ -2434,8 +2409,7 @@ async def cb_report_task(callback: CallbackQuery):
         if creator_id == callback.from_user.id:
             await callback.answer(get_text(lang, 'report_self'), show_alert=True)
             return
-        await db.execute('INSERT INTO task_reports (task_id, reporter_id, reason) VALUES (?, ?, ?)',
-                         (task_id, callback.from_user.id, 'Не указана'))
+        await db.execute('INSERT INTO task_reports (task_id, reporter_id, reason) VALUES (?, ?, ?)', (task_id, callback.from_user.id, 'Не указана'))
         cursor = await db.execute('SELECT COUNT(*) FROM task_reports WHERE task_id = ?', (task_id,))
         report_count = (await cursor.fetchone())[0]
         await db.commit()
@@ -2483,8 +2457,7 @@ async def cb_support(callback: CallbackQuery, state: FSMContext):
 async def msg_support(message: Message, state: FSMContext):
     lang = await get_user_lang(message.from_user.id)
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute('SELECT is_premium, premium_expires_at FROM users WHERE telegram_id = ?',
-                                  (message.from_user.id,))
+        cursor = await db.execute('SELECT is_premium, premium_expires_at FROM users WHERE telegram_id = ?', (message.from_user.id,))
         user = await cursor.fetchone()
         is_premium = False
         if user and user[0] and user[1] and datetime.fromisoformat(user[1]) > datetime.now():
@@ -2575,7 +2548,7 @@ async def cb_show_top(callback: CallbackQuery):
     medals = ["🥇", "🥈", "🥉"]
     for i, (telegram_id, username, total_earned) in enumerate(top_users):
         username_display = f"@{escape_md(username)}" if username else "Аноним"
-        medal = medals[i] if i < 3 else f"{i + 1}."
+        medal = medals[i] if i < 3 else f"{i+1}."
         if telegram_id == callback.from_user.id:
             text += get_text(lang, 'top_line_you', medal=medal, name=username_display, n=total_earned)
         else:
@@ -2623,8 +2596,7 @@ async def cb_admin_stats(callback: CallbackQuery):
     async with aiosqlite.connect('bot_database.db') as db:
         total_users = (await (await db.execute('SELECT COUNT(*) FROM users')).fetchone())[0]
         active_tasks = (await (await db.execute("SELECT COUNT(*) FROM tasks WHERE status = 'active'")).fetchone())[0]
-        completed_tasks = \
-        (await (await db.execute("SELECT COUNT(*) FROM tasks WHERE status = 'completed'")).fetchone())[0]
+        completed_tasks = (await (await db.execute("SELECT COUNT(*) FROM tasks WHERE status = 'completed'")).fetchone())[0]
         total_turnover = (await (await db.execute("SELECT SUM(ABS(amount)) FROM transactions")).fetchone())[0] or 0
         banned_users = (await (await db.execute('SELECT COUNT(*) FROM users WHERE is_banned = 1')).fetchone())[0]
         premium_users = (await (await db.execute('SELECT COUNT(*) FROM users WHERE is_premium = 1')).fetchone())[0]
@@ -2671,8 +2643,7 @@ async def cb_admin_mailing(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id != ADMIN_ID:
         await callback.answer("⛔️ Нет доступа!", show_alert=True)
         return
-    await callback.message.edit_text("📢 *Рассылка*\n\nОтправь сообщение для рассылки (текст, фото или стикер):",
-                                     parse_mode="Markdown")
+    await callback.message.edit_text("📢 *Рассылка*\n\nОтправь сообщение для рассылки (текст, фото или стикер):", parse_mode="Markdown")
     await state.set_state(AdminStates.mailing_message)
     await callback.answer()
 
@@ -2689,8 +2660,7 @@ async def msg_admin_mailing(message: Message, state: FSMContext):
             [InlineKeyboardButton(text="✅ Отправить всем", callback_data="confirm_mailing")],
             [InlineKeyboardButton(text="❌ Отмена", callback_data="cancel_mailing")]
         ])
-        await message.answer_photo(photo=photo_file_id, caption=f"📢 *Превью:*\n\n{caption}", reply_markup=kb,
-                                   parse_mode="Markdown")
+        await message.answer_photo(photo=photo_file_id, caption=f"📢 *Превью:*\n\n{caption}", reply_markup=kb, parse_mode="Markdown")
     elif message.sticker:
         sticker_file_id = message.sticker.file_id
         await state.update_data(mailing_sticker=sticker_file_id, has_sticker=True)
@@ -2744,11 +2714,9 @@ async def cb_confirm_mailing(callback: CallbackQuery, state: FSMContext):
             fail_count += 1
     await state.clear()
     try:
-        await progress_msg.edit_text(
-            f"✅ Рассылка завершена!\n\n👥 Всего: {total}\n✅ Успешно: {success_count}\n❌ Ошибок: {fail_count}")
+        await progress_msg.edit_text(f"✅ Рассылка завершена!\n\n👥 Всего: {total}\n✅ Успешно: {success_count}\n❌ Ошибок: {fail_count}")
     except:
-        await callback.message.answer(
-            f"✅ Рассылка завершена!\n\n👥 Всего: {total}\n✅ Успешно: {success_count}\n❌ Ошибок: {fail_count}")
+        await callback.message.answer(f"✅ Рассылка завершена!\n\n👥 Всего: {total}\n✅ Успешно: {success_count}\n❌ Ошибок: {fail_count}")
     await callback.answer()
 
 
@@ -2779,8 +2747,7 @@ async def msg_admin_write_to_user_search(message: Message, state: FSMContext):
     search_value = message.text.strip().lstrip('@')
     async with aiosqlite.connect('bot_database.db') as db:
         if search_value.isdigit():
-            cursor = await db.execute('SELECT telegram_id, username FROM users WHERE telegram_id = ?',
-                                      (int(search_value),))
+            cursor = await db.execute('SELECT telegram_id, username FROM users WHERE telegram_id = ?', (int(search_value),))
         else:
             cursor = await db.execute('SELECT telegram_id, username FROM users WHERE username = ?', (search_value,))
         user = await cursor.fetchone()
@@ -2825,8 +2792,7 @@ async def cb_admin_create_task(callback: CallbackQuery, state: FSMContext):
         [InlineKeyboardButton(text="🤖 Запуск бота", callback_data="admin_task_type:start_bot")],
         [InlineKeyboardButton(text="❌ Отмена", callback_data="admin_panel")]
     ])
-    await callback.message.edit_text("➕ *Создание задания (админ)*\n\nВыбери тип:", reply_markup=kb,
-                                     parse_mode="Markdown")
+    await callback.message.edit_text("➕ *Создание задания (админ)*\n\nВыбери тип:", reply_markup=kb, parse_mode="Markdown")
     await state.set_state(CreateTaskStates.choosing_type)
     await callback.answer()
 
@@ -2848,8 +2814,7 @@ async def cb_admin_create_special(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id != ADMIN_ID:
         await callback.answer("⛔️ Нет доступа!", show_alert=True)
         return
-    await callback.message.edit_text("⭐️ *Особое задание*\n\nВведи описание задания (что должен сделать пользователь):",
-                                     parse_mode="Markdown")
+    await callback.message.edit_text("⭐️ *Особое задание*\n\nВведи описание задания (что должен сделать пользователь):", parse_mode="Markdown")
     await state.set_state(AdminStates.special_task_description)
     await callback.answer()
 
@@ -2929,10 +2894,8 @@ async def cb_confirm_special_task(callback: CallbackQuery, state: FSMContext):
         await db.execute('''
             INSERT INTO tasks (creator_id, task_type, link, reward, budget, max_executors, completed_count, status, description)
             VALUES (?, ?, ?, ?, ?, ?, 0, 'active', ?)
-        ''', (callback.from_user.id, 'special', 'special_task', data['special_reward'], data['budget'],
-              data['max_executors'], data['special_description']))
-        await db.execute('UPDATE users SET balance = balance - ? WHERE telegram_id = ?',
-                         (data['budget'], callback.from_user.id))
+        ''', (callback.from_user.id, 'special', 'special_task', data['special_reward'], data['budget'], data['max_executors'], data['special_description']))
+        await db.execute('UPDATE users SET balance = balance - ? WHERE telegram_id = ?', (data['budget'], callback.from_user.id))
         await db.execute(
             'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
             (callback.from_user.id, -data['budget'], 'task_create', 'Создание особого задания')
@@ -2943,7 +2906,6 @@ async def cb_confirm_special_task(callback: CallbackQuery, state: FSMContext):
     await callback.answer()
 
 
-# --- УДАЛЕНИЕ ЗАДАНИЯ АДМИНОМ ---
 @router.callback_query(F.data == "admin_delete_task")
 async def cb_admin_delete_task(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id != ADMIN_ID:
@@ -2964,45 +2926,45 @@ async def cb_admin_delete_task(callback: CallbackQuery, state: FSMContext):
 async def msg_admin_delete_task(message: Message, state: FSMContext):
     if message.from_user.id != ADMIN_ID:
         return
-
+    
     try:
         task_id = int(message.text.strip())
     except ValueError:
         await message.answer("⚠️ Введи число (ID задания)!")
         return
-
+    
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute(
             'SELECT id, creator_id, budget, reward, completed_count, max_executors, status FROM tasks WHERE id = ?',
             (task_id,)
         )
         task = await cursor.fetchone()
-
+        
         if not task:
             await message.answer("❌ Задание не найдено!")
             await state.clear()
             return
-
+        
         t_id, creator_id, budget, reward, completed, max_exec, status = task
-
+        
         if status not in ['active', 'reported']:
             await message.answer(f"⚠️ Задание уже в статусе '{status}', удалять нечего.")
             await state.clear()
             return
-
+        
         refund = budget - (completed * reward)
-
+        
         await db.execute("UPDATE tasks SET status = 'deleted' WHERE id = ?", (task_id,))
-
+        
         if refund > 0:
             await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?', (refund, creator_id))
             await db.execute(
                 'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
                 (creator_id, refund, 'task_delete_refund', f'Возврат токенов при удалении задания #{task_id} админом')
             )
-
+        
         await db.commit()
-
+    
     await state.clear()
     await message.answer(
         f"✅ Задание #{task_id} удалено!\n"
@@ -3011,27 +2973,26 @@ async def msg_admin_delete_task(message: Message, state: FSMContext):
     )
 
 
-# --- УДАЛЕНИЕ ВСЕХ ЗАДАНИЙ АДМИНОМ ---
 @router.callback_query(F.data == "admin_delete_all_tasks")
 async def cb_admin_delete_all_tasks(callback: CallbackQuery, state: FSMContext):
     if callback.from_user.id != ADMIN_ID:
         await callback.answer("⛔️ Нет доступа!", show_alert=True)
         return
-
+    
     async with aiosqlite.connect('bot_database.db') as db:
         cursor = await db.execute("SELECT COUNT(*) FROM tasks WHERE status = 'active'")
         count = (await cursor.fetchone())[0]
-
+    
     if count == 0:
         await callback.message.edit_text("📋 Нет активных заданий для удаления.")
         await callback.answer()
         return
-
+    
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="⚠️ ДА, УДАЛИТЬ ВСЕ", callback_data="confirm_delete_all_tasks")],
         [InlineKeyboardButton(text="❌ Отмена", callback_data="admin_panel")]
     ])
-
+    
     await callback.message.edit_text(
         f"⚠️ *ВНИМАНИЕ!*\n\n"
         f"Ты собираешься удалить **ВСЕ** активные задания ({count} шт.).\n\n"
@@ -3049,32 +3010,30 @@ async def cb_confirm_delete_all_tasks(callback: CallbackQuery, state: FSMContext
     if callback.from_user.id != ADMIN_ID:
         await callback.answer("⛔️ Нет доступа!", show_alert=True)
         return
-
+    
     async with aiosqlite.connect('bot_database.db') as db:
-        cursor = await db.execute(
-            "SELECT id, creator_id, budget, reward, completed_count FROM tasks WHERE status = 'active'")
+        cursor = await db.execute("SELECT id, creator_id, budget, reward, completed_count FROM tasks WHERE status = 'active'")
         tasks = await cursor.fetchall()
-
+        
         total_count = len(tasks)
         total_refund = 0
-
+        
         for task in tasks:
             task_id, creator_id, budget, reward, completed = task
             refund = budget - (completed * reward)
-
+            
             await db.execute("UPDATE tasks SET status = 'deleted' WHERE id = ?", (task_id,))
-
+            
             if refund > 0:
                 await db.execute('UPDATE users SET balance = balance + ? WHERE telegram_id = ?', (refund, creator_id))
                 await db.execute(
                     'INSERT INTO transactions (user_id, amount, type, description) VALUES (?, ?, ?, ?)',
-                    (creator_id, refund, 'task_delete_refund',
-                     f'Возврат токенов при массовом удалении заданий (задание #{task_id})')
+                    (creator_id, refund, 'task_delete_refund', f'Возврат токенов при массовом удалении заданий (задание #{task_id})')
                 )
                 total_refund += refund
-
+        
         await db.commit()
-
+    
     await callback.message.edit_text(
         f"✅ Удалено заданий: {total_count}\n"
         f"💰 Возвращено токенов пользователям: {total_refund}"
@@ -3122,13 +3081,11 @@ async def msg_admin_add_premium_days(message: Message, state: FSMContext):
             return
         user_id = user[0]
         expires_at = (datetime.now() + timedelta(days=days)).isoformat()
-        await db.execute('UPDATE users SET is_premium = 1, premium_expires_at = ? WHERE telegram_id = ?',
-                         (expires_at, user_id))
+        await db.execute('UPDATE users SET is_premium = 1, premium_expires_at = ? WHERE telegram_id = ?', (expires_at, user_id))
         await db.commit()
     expires = datetime.fromisoformat(expires_at)
     await state.clear()
-    await message.answer(
-        f"✅ Премиум выдан @{username} на {days} дней!\nДо: {escape_md(expires.strftime('%d.%m.%Y %H:%M'))}")
+    await message.answer(f"✅ Премиум выдан @{username} на {days} дней!\nДо: {escape_md(expires.strftime('%d.%m.%Y %H:%M'))}")
 
 
 @router.callback_query(F.data == "admin_ban")
@@ -3241,8 +3198,7 @@ async def msg_admin_create_promo_uses(message: Message, state: FSMContext):
     amount = data['promo_amount']
     async with aiosqlite.connect('bot_database.db') as db:
         try:
-            await db.execute('INSERT INTO promo_codes (code, amount, max_uses) VALUES (?, ?, ?)',
-                             (promo_code, amount, max_uses))
+            await db.execute('INSERT INTO promo_codes (code, amount, max_uses) VALUES (?, ?, ?)', (promo_code, amount, max_uses))
             await db.commit()
         except aiosqlite.IntegrityError:
             await message.answer("❌ Промокод уже существует!")
@@ -3315,11 +3271,9 @@ async def msg_admin_add_tokens_amount(message: Message, state: FSMContext):
     search_value = data['target_search']
     async with aiosqlite.connect('bot_database.db') as db:
         if search_value.isdigit():
-            cursor = await db.execute('SELECT telegram_id, username, balance FROM users WHERE telegram_id = ?',
-                                      (int(search_value),))
+            cursor = await db.execute('SELECT telegram_id, username, balance FROM users WHERE telegram_id = ?', (int(search_value),))
         else:
-            cursor = await db.execute('SELECT telegram_id, username, balance FROM users WHERE username = ?',
-                                      (search_value,))
+            cursor = await db.execute('SELECT telegram_id, username, balance FROM users WHERE username = ?', (search_value,))
         user = await cursor.fetchone()
         if not user:
             await message.answer("❌ Пользователь не найден!")
